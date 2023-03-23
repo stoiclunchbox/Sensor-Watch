@@ -33,6 +33,13 @@ typedef enum {
     // to_pause, // TODO implement pausing
 } tomato_mode;
 
+// WIP pause functionality
+/* typedef enum { */
+/*     tomato_ready, */
+/*     tomato_run, */
+/*     tomato_pause, */
+/* } tomato_mode; */
+
 typedef enum {
     tomato_break,
     tomato_focus,

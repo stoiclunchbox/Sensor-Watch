@@ -57,6 +57,19 @@ static void tomato_start(tomato_state_t *state, movement_settings_t *settings) {
     watch_set_indicator(WATCH_INDICATOR_BELL);
 }
 
+// WIP pause functionality
+/* static void tomato_pause(tomato_state_t *state, movement_settings_t *settings) { */
+/*     watch_date_time now = watch_rtc_get_date_time(); */
+/*     int8_t length = (int8_t) get_length(state); */
+
+/*     state->mode = tomato_run; */
+/*     state->now_ts = watch_utility_date_time_to_unix_time(now, get_tz_offset(settings)); */
+/*     state->target_ts = watch_utility_offset_timestamp(state->now_ts, 0, length, 0); */
+/*     watch_date_time target_dt = watch_utility_date_time_from_unix_time(state->target_ts, get_tz_offset(settings)); */
+/*     movement_schedule_background_task(target_dt); */
+/*     watch_set_indicator(WATCH_INDICATOR_BELL); */
+/* } */
+
 static void tomato_draw(tomato_state_t *state) {
     char buf[16];
 
@@ -168,6 +181,26 @@ bool tomato_face_loop(movement_event_t event, movement_settings_t *settings, voi
         case EVENT_ALARM_LONG_PRESS:
             state->done_count = 0;
             break;
+        // WIP pause functionality
+        /* case EVENT_ALARM_BUTTON_UP: */
+        /*     switch(state->mode) { */
+        /*         case tomato_run: */
+        /*             tomato_pause(state); */
+        /*             break; */
+        /*         case tomato_pause: */
+        /*             tomato_start(state, settings); */
+        /*             break; */
+        /*         case tomato_ready: */
+        /*             tomato_start(state, settings); */
+        /*             break; */
+        /*     } */
+        /*     tomato_draw(state); */
+
+        /*     break; */
+        /* case EVENT_ALARM_LONG_PRESS: */
+        /*     tomato_reset(state); */
+        /*     state->done_count = 0; */
+        /*     break; */
         case EVENT_BACKGROUND_TASK:
             tomato_ring(state);
             tomato_draw(state);

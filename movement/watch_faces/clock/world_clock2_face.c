@@ -133,7 +133,9 @@ const char *zone_names[] = {
     "ACST",	// 16 :   9:30:00 (Australian Central Standard Time)
     "AEST",	// 17 :  10:00:00 (Australian Eastern Standard Time)
     "LHST",	// 18 :  10:30:00 (Lord Howe Standard Time)
-    "SBT",	// 19 :  11:00:00 (Solomon Islands Time)
+    /* "SBT",	// 19 :  11:00:00 (Solomon Islands Time) */
+    // MY DEFAULTS turn SIT into AEDT (cos sydney)
+    "SD",	// 19 :  11:00:00 (Solomon Islands Time)
     "NZST",	// 20 :  12:00:00 (New Zealand Standard Time)
     "CHAS",	// 21 :  12:45:00 (Chatham Standard Time)
     "TOT",	// 22 :  13:00:00 (Tonga Time)
@@ -205,7 +207,15 @@ void world_clock2_face_setup(movement_settings_t *settings, uint8_t watch_face_i
 
         /* Start in settings mode */
         world_clock2_state_t *state = (world_clock2_state_t *) * context_ptr;
-        state->current_mode = WORLD_CLOCK2_MODE_SETTINGS;
+        // MY DEFAULTS don't open settings if no timezones selected
+        /* state->current_mode = WORLD_CLOCK2_MODE_SETTINGS; */
+
+        // MY DEFAULTS preselected timezones
+        state->zones[0].selected = true;    //UTC
+        state->zones[19].selected = true;   //SYD
+        state->zones[30].selected = true;   //LA
+        state->zones[33].selected = true;   //NYC
+
     }
 }
 
@@ -238,6 +248,7 @@ static bool mode_display(movement_event_t event, movement_settings_t *settings, 
     uint32_t timestamp;
     uint32_t previous_date_time;
     watch_date_time date_time;
+    watch_date_time date_time_local_day;
 
     switch (event.event_type) {
 	case EVENT_ACTIVATE:
@@ -256,6 +267,7 @@ static bool mode_display(movement_event_t event, movement_settings_t *settings, 
 
             /* Determine current time at time zone and store date/time */
 	    date_time = watch_rtc_get_date_time();
+	    date_time_local_day = watch_rtc_get_date_time();
 	    timestamp = watch_utility_date_time_to_unix_time(date_time, movement_timezone_offsets[settings->bit.time_zone] * 60);
 	    date_time = watch_utility_date_time_from_unix_time(timestamp, movement_timezone_offsets[state->current_zone] * 60);
 	    previous_date_time = state->previous_date_time;
@@ -284,24 +296,43 @@ static bool mode_display(movement_event_t event, movement_settings_t *settings, 
 		}
 
 		pos = 0;
-		if (event.event_type == EVENT_LOW_ENERGY_UPDATE) {
-		    if (!watch_tick_animation_is_running())
-			watch_start_tick_animation(500);
 
-		    sprintf(buf, "%.2s%2d%2d%02d  ",
-                            zone_names[state->current_zone],
-                            date_time.unit.day,
-                            date_time.unit.hour,
-                            date_time.unit.minute);
-		} else {
-		    sprintf(buf, "%.2s%2d%2d%02d%02d",
-			    zone_names[state->current_zone],
-                            date_time.unit.day,
-                            date_time.unit.hour,
-                            date_time.unit.minute,
-                            date_time.unit.second);
-		}
-	    }
+        // supress date display if same as local timezone
+        if (date_time.unit.day == date_time_local_day.unit.day) {
+            if (event.event_type == EVENT_LOW_ENERGY_UPDATE) {
+                if (!watch_tick_animation_is_running())
+                watch_start_tick_animation(500);
+                sprintf(buf, "%.2s  %2d%02d  ",
+                                zone_names[state->current_zone],
+                                date_time.unit.hour,
+                                date_time.unit.minute);
+            } else {
+                sprintf(buf, "%.2s  %2d%02d%02d",
+                    zone_names[state->current_zone],
+                                date_time.unit.hour,
+                                date_time.unit.minute,
+                                date_time.unit.second);
+            }
+        } else {
+            if (event.event_type == EVENT_LOW_ENERGY_UPDATE) {
+                if (!watch_tick_animation_is_running())
+                watch_start_tick_animation(500);
+                sprintf(buf, "%.2s%2d%2d%02d  ",
+                                zone_names[state->current_zone],
+                                date_time.unit.day,
+                                date_time.unit.hour,
+                                date_time.unit.minute);
+            } else {
+                sprintf(buf, "%.2s%2d%2d%02d%02d",
+                    zone_names[state->current_zone],
+                                date_time.unit.day,
+                                date_time.unit.hour,
+                                date_time.unit.minute,
+                                date_time.unit.second);
+            }
+        }
+
+        }
 	    watch_display_string(buf, pos);
 	    break;
 	case EVENT_ALARM_BUTTON_UP:
@@ -332,6 +363,9 @@ static bool mode_display(movement_event_t event, movement_settings_t *settings, 
             movement_request_tick_frequency(1);
             movement_move_to_next_face();
             break;
+    case EVENT_TIMEOUT:
+        movement_move_to_face(0);
+        break;
 	default:
 	    return movement_default_loop_handler(event, settings);
     }
@@ -424,6 +458,9 @@ static bool mode_settings(movement_event_t event, movement_settings_t *settings,
             movement_request_tick_frequency(1);
             movement_move_to_next_face();
             break;
+    case EVENT_TIMEOUT:
+        movement_move_to_face(0);
+        break;
         default:
             return movement_default_loop_handler(event, settings);
     }

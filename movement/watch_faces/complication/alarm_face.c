@@ -44,8 +44,8 @@
     - In setting mode an alarm slot is selected by pressing the alarm button when the slot number 
       in the upper right corner is blinking.
     - For each alarm slot, you can select the day. These are the day modes:
-        - ED = the alarm rings every day
         - 1t = the alarm fires only one time and is erased afterwards
+        - ED = the alarm rings every day
         - MF = the alarm fires Mondays to Fridays
         - WN = the alarm fires on weekends (Sa/Su)
         - MO to SU = the alarm fires only on the given day of week
@@ -66,7 +66,7 @@ typedef enum {
     alarm_setting_idx_beeps
 } alarm_setting_idx_t;
 
-static const char _dow_strings[ALARM_DAY_STATES + 1][2] ={"AL", "MO", "TU", "WE", "TH", "FR", "SA", "SO", "ED", "1t", "MF", "WN"};
+static const char _dow_strings[ALARM_DAY_STATES + 1][2] ={"AL", "MO", "TU", "WE", "TH", "FR", "SA", "SO", "1t", "ED", "MF", "WN"};
 static const uint8_t _blink_idx[ALARM_SETTING_STATES] = {2, 0, 4, 6, 8, 9};
 static const uint8_t _blink_idx2[ALARM_SETTING_STATES] = {3, 1, 5, 7, 8, 9};
 static const BuzzerNote _buzzer_notes[3] = {BUZZER_NOTE_B6, BUZZER_NOTE_C8, BUZZER_NOTE_A8};
@@ -108,6 +108,8 @@ static void _alarm_face_draw(movement_settings_t *settings, alarm_state_t *state
             watch_clear_indicator(WATCH_INDICATOR_PM);
         }
         if (h == 0) h = 12;
+    } else {
+        watch_set_indicator(WATCH_INDICATOR_24H);
     }
     sprintf(buf, "%c%c%2d%2d%02d  ",
         _dow_strings[i][0], _dow_strings[i][1],
@@ -145,7 +147,7 @@ static void _alarm_face_draw(movement_settings_t *settings, alarm_state_t *state
 
 static void _alarm_initiate_setting(movement_settings_t *settings, alarm_state_t *state, uint8_t subsecond) {
     state->is_setting = true;
-    state->setting_state = 0;
+    state->setting_state = 1;
     movement_request_tick_frequency(4);
     _alarm_face_draw(settings, state, subsecond);
 }
@@ -233,9 +235,9 @@ void alarm_face_setup(movement_settings_t *settings, uint8_t watch_face_index, v
         memset(*context_ptr, 0, sizeof(alarm_state_t));
         // initialize the default alarm values
         for (uint8_t i = 0; i < ALARM_ALARMS; i++) {
-            state->alarm[i].day = ALARM_DAY_EACH_DAY;
-            state->alarm[i].beeps = 5;
-            state->alarm[i].pitch = 1;
+            state->alarm[i].day = ALARM_DAY_ONE_TIME;
+            state->alarm[i].beeps = 5; // TODO set peferred default
+            state->alarm[i].pitch = 1; // TODO set peferred default
         }
         state->alarm_handled_minute = -1;
         _wait_ticks = -1;

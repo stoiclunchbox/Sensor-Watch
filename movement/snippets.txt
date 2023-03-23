@@ -1,0 +1,25 @@
+# vim: ft=c
+
+// initiate fast cycling for hour or minute settings
+movement_request_tick_frequency(8);
+state->alarm_quick_ticks = true;
+break;
+
+// only illuminate if we're in display mode
+if (state-><current_page> == 0) movement_illuminate_led();
+break;
+
+if (state->setting_state >= ALARM_SETTING_STATES) {
+    // we have done a full settings cycle, so resume to normal
+    _alarm_resume_setting(settings, state, event.subsecond);
+}
+
+case EVENT_TIMEOUT:
+    movement_move_to_face(0);
+    break;
+
+// draw pitch level indicator
+    if ((subsecond % 2) == 0 || (state->setting_state != alarm_setting_idx_pitch)) {
+    for (i = 0; i <= state->alarm[state->alarm_idx].pitch && i < 3; i++)
+        watch_set_pixel(_buzzer_segdata[i][0], _buzzer_segdata[i][1]);
+}

@@ -245,6 +245,7 @@ typedef struct {
 
     // transient properties
     int16_t current_watch_face;
+    int16_t prev_watch_face;
     int16_t next_watch_face;
     bool watch_face_changed;
     bool fast_tick_enabled;

@@ -64,6 +64,7 @@ SRCS += \
   ../watch_faces/demo/lis2dw_logging_face.c \
   ../watch_faces/demo/demo_face.c \
   ../watch_faces/demo/hello_there_face.c \
+  ../watch_faces/complication/memory_device_face.c \
   ../watch_faces/complication/pulsometer_face.c \
   ../watch_faces/complication/day_one_face.c \
   ../watch_faces/complication/stopwatch_face.c \

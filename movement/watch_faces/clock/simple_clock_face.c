@@ -128,6 +128,22 @@ bool simple_clock_face_loop(movement_event_t event, movement_settings_t *setting
             // handle alarm indicator
             if (state->alarm_enabled != settings->bit.alarm_enabled) _update_alarm_indicator(settings->bit.alarm_enabled, state);
             break;
+        case EVENT_ALARM_BUTTON_UP:
+            date_time = watch_rtc_get_date_time();
+            settings->bit.clock_mode_24h = !(settings->bit.clock_mode_24h);
+            if (!settings->bit.clock_mode_24h) {
+                watch_clear_indicator(WATCH_INDICATOR_24H);
+                if (date_time.unit.hour >= 12) watch_set_indicator(WATCH_INDICATOR_PM);
+                date_time.unit.hour %= 12;
+                if (date_time.unit.hour == 0) date_time.unit.hour = 12;
+            } else {
+                watch_clear_indicator(WATCH_INDICATOR_PM);
+                watch_set_indicator(WATCH_INDICATOR_24H);
+            }
+            pos = 0;
+            sprintf(buf, "%s%2d%2d%02d%02d", watch_utility_get_weekday(date_time), date_time.unit.day, date_time.unit.hour, date_time.unit.minute, date_time.unit.second);
+            watch_display_string(buf, pos);
+            break;
         case EVENT_ALARM_LONG_PRESS:
             state->signal_enabled = !state->signal_enabled;
             if (state->signal_enabled) watch_set_indicator(WATCH_INDICATOR_BELL);

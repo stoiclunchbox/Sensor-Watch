@@ -22,6 +22,7 @@
  * SOFTWARE.
  */
 
+// WIP adjust this?
 #define MOVEMENT_LONG_PRESS_TICKS 64
 
 #include <stdio.h>
@@ -61,10 +62,10 @@
 
 // Set default LED colors if not set
 #ifndef MOVEMENT_DEFAULT_RED_COLOR
-#define MOVEMENT_DEFAULT_RED_COLOR 0x0
+#define MOVEMENT_DEFAULT_RED_COLOR 0xF
 #endif
 #ifndef MOVEMENT_DEFAULT_GREEN_COLOR
-#define MOVEMENT_DEFAULT_GREEN_COLOR 0xF
+#define MOVEMENT_DEFAULT_GREEN_COLOR 0x3
 #endif
 
 #if __EMSCRIPTEN__
@@ -74,6 +75,7 @@
 movement_state_t movement_state;
 void * watch_face_contexts[MOVEMENT_NUM_FACES];
 watch_date_time scheduled_tasks[MOVEMENT_NUM_FACES];
+//TODO
 const int32_t movement_le_inactivity_deadlines[8] = {INT_MAX, 3600, 7200, 21600, 43200, 86400, 172800, 604800};
 const int16_t movement_timeout_inactivity_deadlines[4] = {60, 120, 300, 1800};
 movement_event_t event;
@@ -214,7 +216,11 @@ void movement_illuminate_led(void) {
     if (movement_state.settings.bit.led_duration) {
         watch_set_led_color(movement_state.settings.bit.led_red_color ? (0xF | movement_state.settings.bit.led_red_color << 4) : 0,
                             movement_state.settings.bit.led_green_color ? (0xF | movement_state.settings.bit.led_green_color << 4) : 0);
-        movement_state.light_ticks = (movement_state.settings.bit.led_duration * 2 - 1) * 128;
+        //WIP temporary improvement
+        //      aiming for 1.5-2 secs of illumination
+        //      don't forget to update preferences_face.c if numbers end up changed significantly
+        /* movement_state.light_ticks = (movement_state.settings.bit.led_duration * 2 - 1) * 128; */
+        movement_state.light_ticks = (movement_state.settings.bit.led_duration) * 128 * 1.5;
         _movement_enable_fast_tick_if_needed();
     }
 }
@@ -224,10 +230,17 @@ bool movement_default_loop_handler(movement_event_t event, movement_settings_t *
 
     switch (event.event_type) {
         case EVENT_MODE_BUTTON_UP:
+            //BUG offset works correctly for main rotation but returns 2 faces early on alt rotation
+            movement_state.prev_watch_face = (movement_state.current_watch_face + 1);
             movement_move_to_next_face();
             break;
         case EVENT_LIGHT_BUTTON_DOWN:
             movement_illuminate_led();
+            break;
+        case EVENT_LIGHT_LONG_UP:
+            if (movement_state.current_watch_face == 0) {
+                movement_move_to_face(movement_state.prev_watch_face);
+            }
             break;
         case EVENT_MODE_LONG_PRESS:
             if (MOVEMENT_SECONDARY_FACE_INDEX && movement_state.current_watch_face == 0) {
@@ -327,7 +340,7 @@ void app_init(void) {
 
     movement_state.settings.bit.led_red_color = MOVEMENT_DEFAULT_RED_COLOR;
     movement_state.settings.bit.led_green_color = MOVEMENT_DEFAULT_GREEN_COLOR;
-    movement_state.settings.bit.button_should_sound = true;
+    movement_state.settings.bit.button_should_sound = false;
     movement_state.settings.bit.le_interval = 1;
     movement_state.settings.bit.led_duration = 1;
     movement_state.light_ticks = -1;
@@ -358,6 +371,8 @@ void app_setup(void) {
     watch_store_backup_data(movement_state.settings.reg, 0);
 
     static bool is_first_launch = true;
+
+    movement_state.prev_watch_face = 0;
 
     if (is_first_launch) {
         #ifdef MOVEMENT_CUSTOM_BOOT_COMMANDS
