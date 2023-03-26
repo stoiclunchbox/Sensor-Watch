@@ -65,7 +65,7 @@
 #define MOVEMENT_DEFAULT_RED_COLOR 0xF
 #endif
 #ifndef MOVEMENT_DEFAULT_GREEN_COLOR
-#define MOVEMENT_DEFAULT_GREEN_COLOR 0x3
+#define MOVEMENT_DEFAULT_GREEN_COLOR 0x4
 #endif
 
 #if __EMSCRIPTEN__
@@ -75,8 +75,9 @@
 movement_state_t movement_state;
 void * watch_face_contexts[MOVEMENT_NUM_FACES];
 watch_date_time scheduled_tasks[MOVEMENT_NUM_FACES];
-//TODO
-const int32_t movement_le_inactivity_deadlines[8] = {INT_MAX, 3600, 7200, 21600, 43200, 86400, 172800, 604800};
+/* const int32_t movement_le_inactivity_deadlines[8] = {INT_MAX, 3600, 7200, 21600, 43200, 86400, 172800, 604800}; */
+// REVIEW new values
+const int32_t movement_le_inactivity_deadlines[8] = {INT_MAX, 3600, 7200, 10800, 21600, 43200, 86400, 259200};
 const int16_t movement_timeout_inactivity_deadlines[4] = {60, 120, 300, 1800};
 movement_event_t event;
 
@@ -234,9 +235,20 @@ bool movement_default_loop_handler(movement_event_t event, movement_settings_t *
             movement_state.prev_watch_face = (movement_state.current_watch_face + 1);
             movement_move_to_next_face();
             break;
+        // WIP original function
         case EVENT_LIGHT_BUTTON_DOWN:
             movement_illuminate_led();
             break;
+        // WIP
+        // NOTE changes to LIGHT events here are implemented on a trial basis
+        //      and are part of the overall lighting strategy
+        // TODO compare to main branch to be fully certain of intended changes
+        /* case EVENT_LIGHT_BUTTON_UP: */
+        /*     movement_illuminate_led(); */
+        /*     break; */
+        /* case EVENT_LIGHT_LONG_PRESS: */
+        /*     movement_illuminate_led(); */
+        /*     break; */
         case EVENT_LIGHT_LONG_UP:
             if (movement_state.current_watch_face == 0) {
                 movement_move_to_face(movement_state.prev_watch_face);
@@ -341,7 +353,9 @@ void app_init(void) {
     movement_state.settings.bit.led_red_color = MOVEMENT_DEFAULT_RED_COLOR;
     movement_state.settings.bit.led_green_color = MOVEMENT_DEFAULT_GREEN_COLOR;
     movement_state.settings.bit.button_should_sound = false;
+    // BUG not being set / defaulting to never in preferences
     movement_state.settings.bit.le_interval = 1;
+    movement_state.settings.bit.to_interval = 1;
     movement_state.settings.bit.led_duration = 1;
     movement_state.light_ticks = -1;
     movement_state.alarm_ticks = -1;
@@ -370,9 +384,9 @@ void app_wake_from_backup(void) {
 void app_setup(void) {
     watch_store_backup_data(movement_state.settings.reg, 0);
 
-    static bool is_first_launch = true;
-
     movement_state.prev_watch_face = 0;
+
+    static bool is_first_launch = true;
 
     if (is_first_launch) {
         #ifdef MOVEMENT_CUSTOM_BOOT_COMMANDS

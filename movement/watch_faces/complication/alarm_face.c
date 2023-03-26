@@ -66,7 +66,7 @@ typedef enum {
     alarm_setting_idx_beeps
 } alarm_setting_idx_t;
 
-static const char _dow_strings[ALARM_DAY_STATES + 1][2] ={"AL", "MO", "TU", "WE", "TH", "FR", "SA", "SO", "1t", "ED", "MF", "WN"};
+static const char _dow_strings[ALARM_DAY_STATES + 1][2] ={"AL", "MO", "TU", "WE", "TH", "FR", "SA", "SU", "1t", "ED", "MF", "WN"};
 static const uint8_t _blink_idx[ALARM_SETTING_STATES] = {2, 0, 4, 6, 8, 9};
 static const uint8_t _blink_idx2[ALARM_SETTING_STATES] = {3, 1, 5, 7, 8, 9};
 static const BuzzerNote _buzzer_notes[3] = {BUZZER_NOTE_B6, BUZZER_NOTE_C8, BUZZER_NOTE_A8};
@@ -236,8 +236,8 @@ void alarm_face_setup(movement_settings_t *settings, uint8_t watch_face_index, v
         // initialize the default alarm values
         for (uint8_t i = 0; i < ALARM_ALARMS; i++) {
             state->alarm[i].day = ALARM_DAY_ONE_TIME;
-            state->alarm[i].beeps = 5; // TODO set peferred default
-            state->alarm[i].pitch = 1; // TODO set peferred default
+            state->alarm[i].beeps = (ALARM_MAX_BEEP_ROUNDS - 1);
+            state->alarm[i].pitch = 1;
         }
         state->alarm_handled_minute = -1;
         _wait_ticks = -1;
@@ -430,14 +430,17 @@ bool alarm_face_loop(movement_event_t event, movement_settings_t *settings, void
             }
         } else {
             // regular alarm beeps
-            movement_play_alarm_beeps((state->alarm[state->alarm_playing_idx].beeps == (ALARM_MAX_BEEP_ROUNDS - 1) ? 20 : state->alarm[state->alarm_playing_idx].beeps), 
+            // REVIEW L beeps for approx. 2mins
+            movement_play_alarm_beeps((state->alarm[state->alarm_playing_idx].beeps == (ALARM_MAX_BEEP_ROUNDS - 1) ? 150 : state->alarm[state->alarm_playing_idx].beeps), 
                                   _buzzer_notes[state->alarm[state->alarm_playing_idx].pitch]);
         }
         // one time alarm? -> erase it
         if (state->alarm[state->alarm_playing_idx].day == ALARM_DAY_ONE_TIME) {
-            state->alarm[state->alarm_playing_idx].day = ALARM_DAY_EACH_DAY;
+            /* state->alarm[state->alarm_playing_idx].day = ALARM_DAY_EACH_DAY; */
+            // REVIEW fix setting day selection resetting to ED as first option in rotation
+            state->alarm[state->alarm_playing_idx].day = ALARM_DAY_ONE_TIME;
             state->alarm[state->alarm_playing_idx].minute = state->alarm[state->alarm_playing_idx].hour = 0;
-            state->alarm[state->alarm_playing_idx].beeps = 5;
+            state->alarm[state->alarm_playing_idx].beeps = (ALARM_MAX_BEEP_ROUNDS - 1);
             state->alarm[state->alarm_playing_idx].pitch = 1;
             state->alarm[state->alarm_playing_idx].enabled = false;
             _alarm_update_alarm_enabled(settings, state);

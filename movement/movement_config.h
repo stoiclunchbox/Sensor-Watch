@@ -34,6 +34,7 @@ const watch_face_t watch_faces[] = {
     timer_face,
     counter_face,
     sunrise_sunset_face,
+    moon_phase_face,
     thermistor_readout_face,
     ratemeter_face,
     pulsometer_face,
@@ -41,9 +42,14 @@ const watch_face_t watch_faces[] = {
     day_one_face,
     tomato_face,
     probability_face,
-    moon_phase_face,
     databank_face,
     totp_face,
+        totp_face_lfs,
+        habit_face,
+        interval_face,
+        ships_bell_face,
+        rpn_calculator_face,
+        rpn_calculator_alt_face,
 
     memory_device_face,
     alarm_face,
@@ -52,6 +58,10 @@ const watch_face_t watch_faces[] = {
     voltage_face,
     finetune_face,
     nanosec_face,
+        character_set_face,
+        chirpy_demo_face,
+        thermistor_logging_face,
+        tempchart_face,
 };
 
 #define MOVEMENT_NUM_FACES (sizeof(watch_faces) / sizeof(watch_face_t))
@@ -62,6 +72,6 @@ const watch_face_t watch_faces[] = {
  * Usually it makes sense to set this to the preferences face.
  */
 /* #define MOVEMENT_SECONDARY_FACE_INDEX 0 // or (MOVEMENT_NUM_FACES - 2) */
-#define MOVEMENT_SECONDARY_FACE_INDEX (MOVEMENT_NUM_FACES - 7)
+#define MOVEMENT_SECONDARY_FACE_INDEX (MOVEMENT_NUM_FACES - 11)
 
 #endif // MOVEMENT_CONFIG_H_
