@@ -22,8 +22,9 @@
  * SOFTWARE.
  */
 
-// WIP adjust this?
-#define MOVEMENT_LONG_PRESS_TICKS 64
+/* #define MOVEMENT_LONG_PRESS_TICKS 64 */
+// This seems to be a nice amount
+#define MOVEMENT_LONG_PRESS_TICKS 30
 
 #include <stdio.h>
 #include <string.h>
