@@ -32,20 +32,20 @@ static void _memory_device_face_reset(memory_device_state_t *state) {
         for (uint8_t j = 0; j < SLOTS; j++) {
             state->card[i].pos[j] = 0;
         }
-    state->card[i].mode = START_MODE;
+        state->card[i].mode = START_MODE;
+    }
     state->card_idx = 0;
     state->setting_pos = 0;
-    }
 }
 
-static void _memory_device_face_draw(movement_settings_t *settings, memory_device_state_t *state, uint8_t subsecond) {
+static void _memory_device_face_draw(memory_device_state_t *state, uint8_t subsecond) {
     char buf[12];
 
     static const char _face_title[2] = "MD";
     /* static const char _mode_indicator[2] = {'a', 'n'}; */
 
+    // WIP temporarily deactivated mode indicator while not fully implemented
     /* sprintf(buf, "%c%c%d%c%d%d%d%d%2d", */
-    // WIP temporarily deactivated mode indicator and blinking while not fully implemented
     sprintf(buf, "%c%c %d%d%d%d%d%2d",
             _face_title[0],
             _face_title[1],
@@ -98,7 +98,7 @@ bool memory_device_face_loop(movement_event_t event, movement_settings_t *settin
             // Fall through
         case EVENT_ACTIVATE:
             // Show your initial UI here.
-            _memory_device_face_draw(settings, state, event.subsecond);
+            _memory_device_face_draw(state, event.subsecond);
             break;
         case EVENT_LIGHT_BUTTON_DOWN:
             // don't illuminate led immediately
@@ -108,7 +108,7 @@ bool memory_device_face_loop(movement_event_t event, movement_settings_t *settin
             state->card_idx++;
             if (state->card_idx >= CARDS) state->card_idx = 0;
             state->setting_pos = 0;
-            _memory_device_face_draw(settings, state, event.subsecond);
+            _memory_device_face_draw(state, event.subsecond);
             break;
         case EVENT_LIGHT_LONG_PRESS:
             // led
@@ -117,22 +117,23 @@ bool memory_device_face_loop(movement_event_t event, movement_settings_t *settin
         case EVENT_LIGHT_LONG_UP:
             // change mode
             state->card[state->card_idx].mode = (!state->card[state->card_idx].mode);
-            _memory_device_face_draw(settings, state, event.subsecond);
+            _memory_device_face_draw(state, event.subsecond);
             break;
         case EVENT_ALARM_BUTTON_UP:
             // next char
-            // TODO update to use index to allow for cycling through alpha chars
+            // TODO update to use array index to allow for cycling through alpha chars
+            //          or retain 2 different methods of cycling chars for the different modes?
             state->card[state->card_idx].pos[state->setting_pos]++;
             if (state->card[state->card_idx].pos[state->setting_pos] > 9) {
                 state->card[state->card_idx].pos[state->setting_pos] = 0;
             }
-            _memory_device_face_draw(settings, state, event.subsecond);
+            _memory_device_face_draw(state, event.subsecond);
             break;
         case EVENT_ALARM_LONG_PRESS:
             // cycle position
             state->setting_pos++;
             if (state->setting_pos >= SLOTS) state->setting_pos = 0;
-            _memory_device_face_draw(settings, state, event.subsecond);
+            _memory_device_face_draw(state, event.subsecond);
             break;
         case EVENT_TIMEOUT:
             // Your watch face will receive this event after a period of inactivity. If it makes sense to resign,

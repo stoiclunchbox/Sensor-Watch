@@ -31,7 +31,7 @@
 #include "watch_utility.h"
 
 /* static const uint16_t _default_timer_values[] = {0x200, 0x500, 0xA00, 0x1400, 0x2D02}; // default timers: 2 min, 5 min, 10 min, 20 min, 2 h 45 min */
-static const uint32_t _default_timer_values[] = {0x010000, 0x1E0300, 0x2800, 0x3700}; // default timers: 0, 3min30sec, 40min, 55min
+static const uint32_t _default_timer_values[] = {0x010000, 0x1E0300, 0x2800, 0x3700}; // default timers: 1sec, 3min30sec, 40min, 55min
 
 // sound sequence for a single beeping sequence
 static const int8_t _sound_seq_beep[] = {BUZZER_NOTE_C8, 3, BUZZER_NOTE_REST, 3, -2, 2, BUZZER_NOTE_C8, 5, BUZZER_NOTE_REST, 25, 0};
@@ -261,7 +261,7 @@ bool timer_face_loop(movement_event_t event, movement_settings_t *settings, void
                     // skip 'loop y/n' and return to beginning of input
                     else if (state->settings_state == 5 && (state->timers[state->current_timer].value & 0xFFFFFF) == 0) state->settings_state = 0;
                     // exit setting
-                    else if (state->settings_state > 6) _resume_setting(state);
+                    else if (state->settings_state > 5) _resume_setting(state);
                     break;
                 default:
                     break;
@@ -313,7 +313,7 @@ bool timer_face_loop(movement_event_t event, movement_settings_t *settings, void
             break;
         case EVENT_BACKGROUND_TASK:
             // play the alarm
-            _beeps_to_play = 4;
+            _beeps_to_play = 14;  // beep rounds - 1
             watch_buzzer_play_sequence((int8_t *)_sound_seq_beep, _signal_callback);
             _reset(state);
             if (state->timers[state->current_timer].unit.repeat) _start(state, settings, false);

@@ -34,6 +34,9 @@ typedef struct {
     bool signal_enabled;
     bool battery_low;
     bool alarm_enabled;
+    // REVIEW implemented to inhibit short alarm press changing 12/24hr setting when waking from low power mode.
+    // It's a poor solution with edge cases and should be fixed at the movement level.
+    bool was_asleep;
 } simple_clock_state_t;
 
 void simple_clock_face_setup(movement_settings_t *settings, uint8_t watch_face_index, void ** context_ptr);

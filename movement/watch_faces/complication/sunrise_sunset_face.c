@@ -287,23 +287,6 @@ void sunrise_sunset_face_setup(movement_settings_t *settings, uint8_t watch_face
     if (*context_ptr == NULL) {
         *context_ptr = malloc(sizeof(sunrise_sunset_state_t));
         memset(*context_ptr, 0, sizeof(sunrise_sunset_state_t));
-
-        // WIP trying to set defaults, compiles but doesn't work
-        /* sunrise_sunset_state_t *state = (sunrise_sunset_state_t *) * context_ptr; */
-
-        /* state->working_latitude.sign = 0; */
-        /* state->working_latitude.hundreds = 0; */
-        /* state->working_latitude.tens = 2; */
-        /* state->working_latitude.ones = 7; */
-        /* state->working_latitude.tenths = 4; */
-        /* state->working_latitude.hundredths = 0; */
-
-        /* state->working_longitude.sign = 1; */
-        /* state->working_longitude.hundreds = 1; */
-        /* state->working_longitude.tens = 5; */
-        /* state->working_longitude.ones = 3; */
-        /* state->working_longitude.tenths = 1; */
-        /* state->working_longitude.hundredths = 2; */
     }
 }
 
@@ -331,20 +314,6 @@ void sunrise_sunset_face_activate(movement_settings_t *settings, void *context) 
     movement_location_t movement_location = (movement_location_t) watch_get_backup_data(1);
     state->working_latitude = _sunrise_sunset_face_struct_from_latlon(movement_location.bit.latitude);
     state->working_longitude = _sunrise_sunset_face_struct_from_latlon(movement_location.bit.longitude);
-
-    // WIP trying to set defaults, compiles but doesn't work
-    /* state->working_latitude.sign = 0; */
-    /* state->working_latitude.hundreds = 0; */
-    /* state->working_latitude.tens = 2; */
-    /* state->working_latitude.ones = 7; */
-    /* state->working_latitude.tenths = 4; */
-    /* state->working_latitude.hundredths = 0; */
-    /* state->working_longitude.sign = 1; */
-    /* state->working_longitude.hundreds = 1; */
-    /* state->working_longitude.tens = 5; */
-    /* state->working_longitude.ones = 3; */
-    /* state->working_longitude.tenths = 1; */
-    /* state->working_longitude.hundredths = 2; */
 }
 
 bool sunrise_sunset_face_loop(movement_event_t event, movement_settings_t *settings, void *context) {

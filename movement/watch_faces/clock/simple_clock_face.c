@@ -43,6 +43,8 @@ void simple_clock_face_setup(movement_settings_t *settings, uint8_t watch_face_i
         simple_clock_state_t *state = (simple_clock_state_t *)*context_ptr;
         state->signal_enabled = false;
         state->watch_face_index = watch_face_index;
+        // NOTE: Temporary solution
+        state->was_asleep = 0;
     }
 }
 
@@ -118,8 +120,11 @@ bool simple_clock_face_loop(movement_event_t event, movement_settings_t *setting
                 }
                 pos = 0;
                 if (event.event_type == EVENT_LOW_ENERGY_UPDATE) {
-                    if (!watch_tick_animation_is_running()) watch_start_tick_animation(500);
+                    // REVIEW remove tick animation
+                    /* if (!watch_tick_animation_is_running()) watch_start_tick_animation(500); */
                     sprintf(buf, "%s%2d%2d%02d  ", watch_utility_get_weekday(date_time), date_time.unit.day, date_time.unit.hour, date_time.unit.minute);
+                    // NOTE: Temporary solution
+                    state->was_asleep = 1;
                 } else {
                     sprintf(buf, "%s%2d%2d%02d%02d", watch_utility_get_weekday(date_time), date_time.unit.day, date_time.unit.hour, date_time.unit.minute, date_time.unit.second);
                 }
@@ -129,6 +134,11 @@ bool simple_clock_face_loop(movement_event_t event, movement_settings_t *setting
             if (state->alarm_enabled != settings->bit.alarm_enabled) _update_alarm_indicator(settings->bit.alarm_enabled, state);
             break;
         case EVENT_ALARM_BUTTON_UP:
+            // NOTE: Temporary solution
+            if (state->was_asleep == 1) {
+                state->was_asleep = 0;
+                break;
+            }
             date_time = watch_rtc_get_date_time();
             settings->bit.clock_mode_24h = !(settings->bit.clock_mode_24h);
             if (!settings->bit.clock_mode_24h) {

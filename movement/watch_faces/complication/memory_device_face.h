@@ -39,7 +39,7 @@
 #define SLOTS  4        // no of available columns (max. 6) (not configurable at the moment)
 
 typedef struct {
-    uint8_t pos[SLOTS];  // REVIEW use of bit-field here
+    uint8_t pos[SLOTS];
     bool mode : 1;
 } card_data_t;
 
