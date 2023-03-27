@@ -354,7 +354,6 @@ void app_init(void) {
     movement_state.settings.bit.led_red_color = MOVEMENT_DEFAULT_RED_COLOR;
     movement_state.settings.bit.led_green_color = MOVEMENT_DEFAULT_GREEN_COLOR;
     movement_state.settings.bit.button_should_sound = false;
-    // BUG not being set / defaulting to never in preferences
     movement_state.settings.bit.le_interval = 1;
     movement_state.settings.bit.to_interval = 1;
     movement_state.settings.bit.led_duration = 1;

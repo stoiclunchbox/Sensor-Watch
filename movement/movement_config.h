@@ -46,6 +46,7 @@ const watch_face_t watch_faces[] = {
     totp_face,
         totp_face_lfs,
         habit_face,
+        time_left_face,
         interval_face,
         ships_bell_face,
         rpn_calculator_face,
