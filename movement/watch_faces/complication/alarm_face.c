@@ -236,8 +236,10 @@ void alarm_face_setup(movement_settings_t *settings, uint8_t watch_face_index, v
         // initialize the default alarm values
         for (uint8_t i = 0; i < ALARM_ALARMS; i++) {
             state->alarm[i].day = ALARM_DAY_ONE_TIME;
+            state->alarm[i].minute = state->alarm[i].hour = 0; // REVIEW
             state->alarm[i].beeps = (ALARM_MAX_BEEP_ROUNDS - 1);
             state->alarm[i].pitch = 1;
+            state->alarm[i].enabled = false; // REVIEW
         }
         state->alarm_handled_minute = -1;
         _wait_ticks = -1;
@@ -268,16 +270,18 @@ bool alarm_face_wants_background_task(movement_settings_t *settings, void *conte
     if (state->alarm_handled_minute == now.unit.minute) return false;
     state->alarm_handled_minute = now.unit.minute;
     // check the rest
-    for (uint8_t i = 0; i < ALARM_ALARMS; i++) {
-        if (state->alarm[i].enabled) {
-            if (state->alarm[i].minute == now.unit.minute) {
-                if (state->alarm[i].hour == now.unit.hour) {
-                    state->alarm_playing_idx = i;
-                    if (state->alarm[i].day == ALARM_DAY_EACH_DAY || state->alarm[i].day == ALARM_DAY_ONE_TIME) return true;
-                    uint8_t weekday_idx = _get_weekday_idx(now);
-                    if (state->alarm[i].day == weekday_idx) return true;
-                    if (state->alarm[i].day == ALARM_DAY_WORKDAY && weekday_idx < 5) return true;
-                    if (state->alarm[i].day == ALARM_DAY_WEEKEND && weekday_idx >= 5) return true;
+    if (!state->is_setting) {  // REVIEW
+        for (uint8_t i = 0; i < ALARM_ALARMS; i++) {
+            if (state->alarm[i].enabled) {
+                if (state->alarm[i].minute == now.unit.minute) {
+                    if (state->alarm[i].hour == now.unit.hour) {
+                        state->alarm_playing_idx = i;
+                        if (state->alarm[i].day == ALARM_DAY_EACH_DAY || state->alarm[i].day == ALARM_DAY_ONE_TIME) return true;
+                        uint8_t weekday_idx = _get_weekday_idx(now);
+                        if (state->alarm[i].day == weekday_idx) return true;
+                        if (state->alarm[i].day == ALARM_DAY_WORKDAY && weekday_idx < 5) return true;
+                        if (state->alarm[i].day == ALARM_DAY_WEEKEND && weekday_idx >= 5) return true;
+                    }
                 }
             }
         }
@@ -430,14 +434,12 @@ bool alarm_face_loop(movement_event_t event, movement_settings_t *settings, void
             }
         } else {
             // regular alarm beeps
-            // REVIEW L beeps for approx. 2mins
-            movement_play_alarm_beeps((state->alarm[state->alarm_playing_idx].beeps == (ALARM_MAX_BEEP_ROUNDS - 1) ? 150 : state->alarm[state->alarm_playing_idx].beeps), 
+            // REVIEW L beeps for approx. 50sec
+            movement_play_alarm_beeps((state->alarm[state->alarm_playing_idx].beeps == (ALARM_MAX_BEEP_ROUNDS - 1) ? 50 : state->alarm[state->alarm_playing_idx].beeps), 
                                   _buzzer_notes[state->alarm[state->alarm_playing_idx].pitch]);
         }
         // one time alarm? -> erase it
         if (state->alarm[state->alarm_playing_idx].day == ALARM_DAY_ONE_TIME) {
-            /* state->alarm[state->alarm_playing_idx].day = ALARM_DAY_EACH_DAY; */
-            // REVIEW fix setting day selection resetting to ED as first option in rotation
             state->alarm[state->alarm_playing_idx].day = ALARM_DAY_ONE_TIME;
             state->alarm[state->alarm_playing_idx].minute = state->alarm[state->alarm_playing_idx].hour = 0;
             state->alarm[state->alarm_playing_idx].beeps = (ALARM_MAX_BEEP_ROUNDS - 1);
