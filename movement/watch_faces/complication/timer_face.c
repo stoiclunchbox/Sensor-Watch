@@ -231,7 +231,7 @@ bool timer_face_loop(movement_event_t event, movement_settings_t *settings, void
             _draw(state, event.subsecond);
             break;
         case EVENT_TICK:
-            if (state->mode == running) state->now_ts++;
+            if (state->mode == running) state->now_ts++; // IMPORTANT really??? a no-checks increment?
             else if (state->mode == pausing) state->pausing_seconds++;
             else if (state->quick_cycle) {
                 if (watch_get_pin_level(BTN_ALARM)) {

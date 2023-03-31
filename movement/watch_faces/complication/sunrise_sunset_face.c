@@ -69,6 +69,8 @@ static void _sunrise_sunset_face_update(movement_settings_t *settings, sunrise_s
     // sunriset returns the rise/set times as signed decimal hours in UTC.
     // this can mean hours below 0 or above 31, which won't fit into a watch_date_time struct.
     // to deal with this, we set aside the offset in hours, and add it back before converting it to a watch_date_time.
+    // NOTE vewy suspicious
+    //          also, why / 60 ?
     double hours_from_utc = ((double)movement_timezone_offsets[settings->bit.time_zone]) / 60.0;
 
     // we loop twice because if it's after sunset today, we need to recalculate to display values for tomorrow.
@@ -100,6 +102,7 @@ static void _sunrise_sunset_face_update(movement_settings_t *settings, sunrise_s
             scratch_time.unit.minute = 0;
             scratch_time.unit.hour = (scratch_time.unit.hour + 1) % 24;
         }
+        // scratch_time now contains rise time in local time
 
         if (date_time.reg < scratch_time.reg) _sunrise_sunset_set_expiration(state, scratch_time);
 
@@ -127,6 +130,7 @@ static void _sunrise_sunset_face_update(movement_settings_t *settings, sunrise_s
             scratch_time.unit.minute = 0;
             scratch_time.unit.hour = (scratch_time.unit.hour + 1) % 24;
         }
+        // scratch_time now contains SET time in local time
 
         if (date_time.reg < scratch_time.reg) _sunrise_sunset_set_expiration(state, scratch_time);
 

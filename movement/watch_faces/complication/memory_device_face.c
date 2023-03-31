@@ -98,6 +98,7 @@ bool memory_device_face_loop(movement_event_t event, movement_settings_t *settin
             // Fall through
         case EVENT_ACTIVATE:
             // Show your initial UI here.
+            state->setting_pos = 0;
             _memory_device_face_draw(state, event.subsecond);
             break;
         case EVENT_LIGHT_BUTTON_DOWN:
