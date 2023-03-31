@@ -120,8 +120,6 @@ bool simple_clock_face_loop(movement_event_t event, movement_settings_t *setting
                 }
                 pos = 0;
                 if (event.event_type == EVENT_LOW_ENERGY_UPDATE) {
-                    // REVIEW remove tick animation
-                    /* if (!watch_tick_animation_is_running()) watch_start_tick_animation(500); */
                     sprintf(buf, "%s%2d%2d%02d  ", watch_utility_get_weekday(date_time), date_time.unit.day, date_time.unit.hour, date_time.unit.minute);
                     // NOTE: Temporary solution
                     state->was_asleep = 1;
@@ -158,6 +156,17 @@ bool simple_clock_face_loop(movement_event_t event, movement_settings_t *setting
             state->signal_enabled = !state->signal_enabled;
             if (state->signal_enabled) watch_set_indicator(WATCH_INDICATOR_BELL);
             else watch_clear_indicator(WATCH_INDICATOR_BELL);
+            break;
+        // added to work with move_to_prev_face()
+        case EVENT_LIGHT_BUTTON_DOWN:
+            break;
+        // added to work with move_to_prev_face()
+        case EVENT_LIGHT_BUTTON_UP:
+            movement_illuminate_led();
+            break;
+        // added to work with move_to_prev_face()
+        case EVENT_LIGHT_LONG_PRESS:
+            movement_illuminate_led();
             break;
         case EVENT_BACKGROUND_TASK:
             // uncomment this line to snap back to the clock face when the hour signal sounds:
