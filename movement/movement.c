@@ -22,9 +22,12 @@
  * SOFTWARE.
  */
 
-/* #define MOVEMENT_LONG_PRESS_TICKS 64 */
-// This seems to be a nice amount
-#define MOVEMENT_LONG_PRESS_TICKS 30
+// REVIEW
+// Keep in range 30-64
+// #define MOVEMENT_LONG_PRESS_TICKS 64  // .5
+// #define MOVEMENT_LONG_PRESS_TICKS 30  // .234
+// #define MOVEMENT_LONG_PRESS_TICKS 45  // .375
+#define MOVEMENT_LONG_PRESS_TICKS 58  // .45
 
 #include <stdio.h>
 #include <string.h>
@@ -329,7 +332,9 @@ void movement_play_alarm(void) {
 
 void movement_play_alarm_beeps(uint8_t rounds, BuzzerNote alarm_note) {
     if (rounds == 0) rounds = 1;
-    if (rounds > 20) rounds = 20;
+    // REVIEW increase this?
+    /* if (rounds > 20) rounds = 20; */
+    if (rounds > 50) rounds = 50;
     movement_request_wake();
     movement_state.alarm_note = alarm_note;
     // our tone is 0.375 seconds of beep and 0.625 of silence, repeated as given.
@@ -642,13 +647,13 @@ void cb_fast_tick(void) {
     // Notice: is it possible that two or more buttons have an identical timestamp? In this case
     // only one of these buttons would receive the long press event. Don't bother for now...
     if (movement_state.light_down_timestamp > 0)
-        if (movement_state.fast_ticks - movement_state.light_down_timestamp == MOVEMENT_LONG_PRESS_TICKS + 1) 
+        if (movement_state.fast_ticks - movement_state.light_down_timestamp == MOVEMENT_LONG_PRESS_TICKS + 1)
             event.event_type = EVENT_LIGHT_LONG_PRESS;
     if (movement_state.mode_down_timestamp > 0)
-        if (movement_state.fast_ticks - movement_state.mode_down_timestamp == MOVEMENT_LONG_PRESS_TICKS + 1) 
+        if (movement_state.fast_ticks - movement_state.mode_down_timestamp == MOVEMENT_LONG_PRESS_TICKS + 1)
             event.event_type = EVENT_MODE_LONG_PRESS;
     if (movement_state.alarm_down_timestamp > 0)
-        if (movement_state.fast_ticks - movement_state.alarm_down_timestamp == MOVEMENT_LONG_PRESS_TICKS + 1) 
+        if (movement_state.fast_ticks - movement_state.alarm_down_timestamp == MOVEMENT_LONG_PRESS_TICKS + 1)
             event.event_type = EVENT_ALARM_LONG_PRESS;
     // this is just a fail-safe; fast tick should be disabled as soon as the button is up, the LED times out, and/or the alarm finishes.
     // but if for whatever reason it isn't, this forces the fast tick off after 20 seconds.
