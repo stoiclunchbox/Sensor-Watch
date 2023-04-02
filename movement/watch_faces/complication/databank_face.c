@@ -21,7 +21,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * Displays some pre-defined data that you might want to remember. Math constants, birthdays, phone numbers...
+ * Displays some pre-defined data that you might want to remember.
+ * Math constants, birthdays, phone numbers...
  */
 
 #include <stdlib.h>
@@ -31,14 +32,25 @@
 #include "watch_private_display.h"
 
 const char *pi_data[] = {
-    "BB", "0431  091687",
+    "DB", " dAtA",
+    "BA", "0431  091687",
     "HE", "HEgH",
-    /* "PI", "314159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211706798214808651328230664709384460955058223172535940812848111745028410270193852110555964462294895493038196442", */
-    /* "S ", "9192631770", */
-    /* "31", "2147483648", */
-    /* "32", "4294967296", */
-    /* "63", "9223372036854775808", */
-    /* "64", "18446744073709551616", */
+
+    "DB", "ntroPy",
+    "4 ", "128",
+    "8 ", "255",
+    "Nt", "16    65536",
+    "Nt", "32    4-29H9  4294967296",
+    "Nt", "64    1-8H19    18446744073709551616",
+
+    "DB", "ConSts",
+    "PI", "3.1415926535897932",
+    "TU", "6.2831853071795864",
+    "e ", "2.7182818284590452",
+    "GR", "1.6180339887498948",
+    "c ", "299792458    M/s",
+    "g ", "9.81   M/s2",
+    "MR", "12.35  us/nM rEtrn",
 };
 //we show 6 characters per screen
 
@@ -68,20 +80,30 @@ void databank_face_activate(movement_settings_t *settings, void *context) {
     databank_state.animating = true;
 }
 
-static void display()
-{
+static void display() {
     char buf[14];
-    int page = databank_state.current_word;
-    sprintf(buf, "%s%2d", pi_data[databank_state.databank_page * 2 + 0], page);
+    int max_words = (strlen(pi_data[databank_state.databank_page * 2 + 1]) - 1) / 6 + 1;
+    int word = databank_state.current_word;
+    watch_clear_indicator(WATCH_INDICATOR_LAP);
+    if (max_words < 2) {
+        sprintf(buf, "%s  ", pi_data[databank_state.databank_page * 2 + 0]);
+    } else {
+        if (word == 0) {
+            watch_set_indicator(WATCH_INDICATOR_LAP);
+            sprintf(buf, "%s%2d", pi_data[databank_state.databank_page * 2 + 0], max_words);
+        } else {
+            sprintf(buf, "%s%2d", pi_data[databank_state.databank_page * 2 + 0], (word + 1));
+        }
+    }
     watch_display_string(buf, 0);
     bool data_ended = false;
     for (int i = 0; i < 6; i++) {
-        if (pi_data[databank_state.databank_page * 2 + 1][page * 6 + i] == 0) {
+        if (pi_data[databank_state.databank_page * 2 + 1][word * 6 + i] == 0) {
             data_ended = true;
         }
 
         if (!data_ended) {
-            watch_display_character(pi_data[databank_state.databank_page * 2 + 1][page * 6 + i], 4 + i);
+            watch_display_character(pi_data[databank_state.databank_page * 2 + 1][word * 6 + i], 4 + i);
         } else {
             // only 6 digits per page
             watch_display_character(' ', 4 + i);
@@ -94,6 +116,14 @@ bool databank_face_loop(movement_event_t event, movement_settings_t *settings, v
     (void) context;
     int max_words = (strlen(pi_data[databank_state.databank_page * 2 + 1]) - 1) / 6 + 1;
 
+    //TODO add long light press to reset:
+    //      a) first word
+    //      b) if (first word) first page
+    //  or
+    //  long light press for light, and
+    //  light up for reset
+    //  (align to memory_device)
+
     switch (event.event_type) {
         case EVENT_ACTIVATE:
              display();
@@ -101,11 +131,12 @@ bool databank_face_loop(movement_event_t event, movement_settings_t *settings, v
             // on activate and tick, if we are animating,
             break;
         case EVENT_LIGHT_BUTTON_UP:
-            // when the user presses 'light', we illuminate the LED. We could override this if
-            // our UI needed an additional button for input, consuming the light button press
-            // but not illuminating the LED.
-            databank_state.current_word = (databank_state.current_word + max_words - 1) % max_words;
-            display();
+            movement_illuminate_led();  // so we can see at night
+            /* // when the user presses 'light', we illuminate the LED. We could override this if */
+            /* // our UI needed an additional button for input, consuming the light button press */
+            /* // but not illuminating the LED. */
+            /* databank_state.current_word = (databank_state.current_word + max_words - 1) % max_words; */
+            /* display(); */
             break;
         case EVENT_LIGHT_LONG_PRESS:
             databank_state.databank_page = (databank_state.databank_page + databank_num_pages - 1) % databank_num_pages;
