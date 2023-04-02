@@ -57,6 +57,8 @@ static void _sunrise_sunset_face_update(movement_settings_t *settings, sunrise_s
     watch_date_time utc_now = watch_utility_date_time_convert_zone(date_time, movement_timezone_offsets[settings->bit.time_zone] * 60, 0); // the current date / time in UTC
     watch_date_time scratch_time; // scratchpad, contains different values at different times
     scratch_time.reg = utc_now.reg;
+   //TESTING
+   bool first_loop = true;
 
     // Weird quirky unsigned things were happening when I tried to cast these directly to doubles below.
     // it looks redundant, but extracting them to local int16's seemed to fix it.
@@ -70,9 +72,6 @@ static void _sunrise_sunset_face_update(movement_settings_t *settings, sunrise_s
     // this can mean hours below 0 or above 31, which won't fit into a watch_date_time struct.
     // to deal with this, we set aside the offset in hours, and add it back before converting it to a watch_date_time.
     double hours_from_utc = ((double)movement_timezone_offsets[settings->bit.time_zone]) / 60.0;
-
-    //TESTING
-    bool first_loop = true;
 
     // we loop twice because if it's after sunset today, we need to recalculate to display values for tomorrow.
     for(int i = 0; i < 2; i++) {
@@ -90,15 +89,21 @@ static void _sunrise_sunset_face_update(movement_settings_t *settings, sunrise_s
         watch_set_colon();
         if (settings->bit.clock_mode_24h) watch_set_indicator(WATCH_INDICATOR_24H);
 
-        //TESTING gotta check this
-        //sets scratch_time.unit.day to correct(?) value ?
-        //  still need to incorporate adding 24hrs for following day though
-        if (first_loop) {
-            scratch_time.reg = date_time.reg;
-        }
-
         rise += hours_from_utc;
         set += hours_from_utc;
+
+        // TZ offset for scratch_time
+        timestamp += (hours_from_utc * 3200);
+        scratch_time = watch_utility_date_time_from_unix_time(timestamp, 0);
+
+       //TESTING gotta check this
+       //sets scratch_time.unit.day to correct(?) value ?
+       //  still need to incorporate adding 24hrs for following day though
+       if (!first_loop) {  // originally intended to be !first_loop?
+           /* scratch_time.reg = date_time.reg; */
+           /* scratch_time.reg + 40960; */
+           scratch_time.unit.day += 1;
+       }
 
         minutes = 60.0 * fmod(rise, 1);
         seconds = 60.0 * fmod(minutes, 1);
@@ -121,6 +126,8 @@ static void _sunrise_sunset_face_update(movement_settings_t *settings, sunrise_s
                     else watch_clear_indicator(WATCH_INDICATOR_PM);
                 }
                 sprintf(buf, "rI%2d%2d%02d  ", scratch_time.unit.day, scratch_time.unit.hour, scratch_time.unit.minute);
+                //TESTING
+                /* sprintf(buf, "rI%2d%f", scratch_time.unit.day, rise); */
                 watch_display_string(buf, 0);
                 return;
             } else {
@@ -128,7 +135,8 @@ static void _sunrise_sunset_face_update(movement_settings_t *settings, sunrise_s
             }
         //TESTING
         } else {
-            sprintf(buf, "%s%2d noPe ", "rI", scratch_time.unit.day);
+            /* sprintf(buf, "rI%2d%2d%02dno", scratch_time.unit.day, scratch_time.unit.hour, scratch_time.unit.minute); */
+            sprintf(buf, "rI%2d%f", scratch_time.unit.day, rise);
             watch_display_string(buf, 0);
         }
 
@@ -153,6 +161,8 @@ static void _sunrise_sunset_face_update(movement_settings_t *settings, sunrise_s
                     else watch_clear_indicator(WATCH_INDICATOR_PM);
                 }
                 sprintf(buf, "SE%2d%2d%02d  ", scratch_time.unit.day, scratch_time.unit.hour, scratch_time.unit.minute);
+                //TESTING
+                /* sprintf(buf, "SE%2d%f", scratch_time.unit.day, set); */
                 watch_display_string(buf, 0);
                 return;
             } else {
@@ -160,7 +170,8 @@ static void _sunrise_sunset_face_update(movement_settings_t *settings, sunrise_s
             }
         //TESTING
         } else {
-            sprintf(buf, "%s%2d noPe ", "SE", scratch_time.unit.day);
+            /* sprintf(buf, "SE%2d%2d%02dno", scratch_time.unit.day, scratch_time.unit.hour, scratch_time.unit.minute); */
+            sprintf(buf, "SE%2d%f", scratch_time.unit.day, set);
             watch_display_string(buf, 0);
         }
 
@@ -168,8 +179,16 @@ static void _sunrise_sunset_face_update(movement_settings_t *settings, sunrise_s
         uint32_t timestamp = watch_utility_date_time_to_unix_time(utc_now, 0);
         timestamp += 86400;
         scratch_time = watch_utility_date_time_from_unix_time(timestamp, 0);
-        //TESTING
-        first_loop = false;
+        // IMPORTANT FIX I think i found it, but I need to make sure I can
+        // definitley test it correctly
+        // As follows:
+        //      when scratch_time has 24hrs added to it here, it's in UTC time,
+        //      the scratch_time.day remains unchanged
+        //      thus,
+        //      we need to add our timezone offset to it after the sunriset calc, but
+        //      we need to do it in the correct format(s)
+       //TESTING
+       first_loop = false;
     }
 }
 
