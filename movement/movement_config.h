@@ -35,6 +35,7 @@ const watch_face_t watch_faces[] = {
     counter_face,
     sunrise_sunset_face,
     moon_phase_face,
+    //tide clock
     thermistor_readout_face,
     ratemeter_face,
     pulsometer_face,
