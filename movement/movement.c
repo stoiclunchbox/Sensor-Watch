@@ -23,36 +23,15 @@
  */
 
 // REVIEW
-// Keep in range 30-64
-// #define MOVEMENT_LONG_PRESS_TICKS 64  // .5
-#define MOVEMENT_LONG_PRESS_TICKS 58  // .45
-// #define MOVEMENT_LONG_PRESS_TICKS 53  // .41
-// #define MOVEMENT_LONG_PRESS_TICKS 48  // .375
-// #define MOVEMENT_LONG_PRESS_TICKS 42  // .33
-// #define MOVEMENT_LONG_PRESS_TICKS 38  // .3
-// #define MOVEMENT_LONG_PRESS_TICKS 32  // .25
-// #define MOVEMENT_LONG_PRESS_TICKS 30  // .234
-
-// TODO list for prefs to iterate over
-// Formula: 64 - (4 * [0..7])
-// #define MOVEMENT_LONG_PRESS_TICKS 64  // .5
-// #define MOVEMENT_LONG_PRESS_TICKS 60  // .47
-// #define MOVEMENT_LONG_PRESS_TICKS 56  // .44
-// #define MOVEMENT_LONG_PRESS_TICKS 52  // .4
-// #define MOVEMENT_LONG_PRESS_TICKS 48  // .375
+// Formula: 64 - (5 * [0..7])
+// #define MOVEMENT_LONG_PRESS_TICKS 64  // .50
+// #define MOVEMENT_LONG_PRESS_TICKS 59  // .46
+// #define MOVEMENT_LONG_PRESS_TICKS 54  // .42
+// #define MOVEMENT_LONG_PRESS_TICKS 49  // .38
 // #define MOVEMENT_LONG_PRESS_TICKS 44  // .34
-// #define MOVEMENT_LONG_PRESS_TICKS 40  // .31
-// #define MOVEMENT_LONG_PRESS_TICKS 36  // .28
-
-// Alternate formula: 64 - (5 * [0..7])
-// #define MOVEMENT_LONG_PRESS_TICKS 64  // .5
-// #define MOVEMENT_LONG_PRESS_TICKS 59
-// #define MOVEMENT_LONG_PRESS_TICKS 54
-// #define MOVEMENT_LONG_PRESS_TICKS 49
-// #define MOVEMENT_LONG_PRESS_TICKS 44
-// #define MOVEMENT_LONG_PRESS_TICKS 39
-// #define MOVEMENT_LONG_PRESS_TICKS 34
-// #define MOVEMENT_LONG_PRESS_TICKS 29  // .226
+// #define MOVEMENT_LONG_PRESS_TICKS 39  // .30
+// #define MOVEMENT_LONG_PRESS_TICKS 34  // .26
+// #define MOVEMENT_LONG_PRESS_TICKS 29  // .22
 
 #include <stdio.h>
 #include <string.h>
@@ -387,6 +366,7 @@ void app_init(void) {
     movement_state.settings.bit.le_interval = 1;
     movement_state.settings.bit.to_interval = 1;
     movement_state.settings.bit.led_duration = 1;
+    movement_state.settings.bit.long_press_duration = 0;
     movement_state.light_ticks = -1;
     movement_state.alarm_ticks = -1;
     movement_state.next_available_backup_register = 4;
@@ -636,8 +616,8 @@ static movement_event_type_t _figure_out_button_event(bool pin_level, movement_e
         uint16_t diff = movement_state.fast_ticks - *down_timestamp;
         *down_timestamp = 0;
         _movement_disable_fast_tick_if_possible();
-        // any press over a half second is considered a long press. Fire the long-up event
-        if (diff > MOVEMENT_LONG_PRESS_TICKS) return button_down_event_type + 3;
+        // any press over a half second (or less if long_press_duration is > 0) is considered a long press. Fire the long-up event
+        if (diff > (64 - (5 * movement_state.settings.bit.long_press_duration))) return button_down_event_type + 3;
         else return button_down_event_type + 1;
     }
 }
@@ -677,13 +657,13 @@ void cb_fast_tick(void) {
     // Notice: is it possible that two or more buttons have an identical timestamp? In this case
     // only one of these buttons would receive the long press event. Don't bother for now...
     if (movement_state.light_down_timestamp > 0)
-        if (movement_state.fast_ticks - movement_state.light_down_timestamp == MOVEMENT_LONG_PRESS_TICKS + 1)
+        if (movement_state.fast_ticks - movement_state.light_down_timestamp == (64 - (5 * movement_state.settings.bit.long_press_duration)) + 1)
             event.event_type = EVENT_LIGHT_LONG_PRESS;
     if (movement_state.mode_down_timestamp > 0)
-        if (movement_state.fast_ticks - movement_state.mode_down_timestamp == MOVEMENT_LONG_PRESS_TICKS + 1)
+        if (movement_state.fast_ticks - movement_state.mode_down_timestamp == (64 - (5 * movement_state.settings.bit.long_press_duration)) + 1)
             event.event_type = EVENT_MODE_LONG_PRESS;
     if (movement_state.alarm_down_timestamp > 0)
-        if (movement_state.fast_ticks - movement_state.alarm_down_timestamp == MOVEMENT_LONG_PRESS_TICKS + 1)
+        if (movement_state.fast_ticks - movement_state.alarm_down_timestamp == (64 - (5 * movement_state.settings.bit.long_press_duration)) + 1)
             event.event_type = EVENT_ALARM_LONG_PRESS;
     // this is just a fail-safe; fast tick should be disabled as soon as the button is up, the LED times out, and/or the alarm finishes.
     // but if for whatever reason it isn't, this forces the fast tick off after 20 seconds.

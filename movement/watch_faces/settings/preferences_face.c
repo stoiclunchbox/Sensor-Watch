@@ -26,12 +26,14 @@
 #include "preferences_face.h"
 #include "watch.h"
 
-#define PREFERENCES_FACE_NUM_PREFEFENCES (7)
+#define PREFERENCES_FACE_NUM_PREFEFENCES (8)
 const char preferences_face_titles[PREFERENCES_FACE_NUM_PREFEFENCES][11] = {
     "CL        ",   // Clock: 12 or 24 hour
     "BT  Beep  ",   // Buttons: should they beep?
     "TO        ",   // Timeout: how long before we snap back to the clock face?
     "LE        ",   // Low Energy mode: how long before it engages?
+    // REVIEW I had hoped to find a better label
+    "BL     Sec",   // Button Long press: duration (in seconds)
     "LT        ",   // Light: duration
 #ifdef WATCH_IS_BLUE_BOARD
     "LT   blu  ",   // Light: blue component (for watches with blue LED)
@@ -83,12 +85,15 @@ bool preferences_face_loop(movement_event_t event, movement_settings_t *settings
                     settings->bit.le_interval = settings->bit.le_interval + 1;
                     break;
                 case 4:
-                    settings->bit.led_duration = settings->bit.led_duration + 1;
+                    settings->bit.long_press_duration = settings->bit.long_press_duration + 1;
                     break;
                 case 5:
-                    settings->bit.led_green_color = settings->bit.led_green_color + 1;
+                    settings->bit.led_duration = settings->bit.led_duration + 1;
                     break;
                 case 6:
+                    settings->bit.led_green_color = settings->bit.led_green_color + 1;
+                    break;
+                case 7:
                     settings->bit.led_red_color = settings->bit.led_red_color + 1;
                     break;
             }
@@ -158,7 +163,12 @@ bool preferences_face_loop(movement_event_t event, movement_settings_t *settings
                         break;
                 }
                 break;
+            // REVIEW
             case 4:
+                sprintf(buf, ".%-2d", (64 - (5 * settings->bit.long_press_duration)) * 100 / 128);
+                watch_display_string(buf, 4);
+                break;
+            case 5:
                 if (settings->bit.led_duration) {
                     sprintf(buf, " %1d SeC", settings->bit.led_duration * 2 - 1);
                     watch_display_string(buf, 4);
@@ -166,11 +176,11 @@ bool preferences_face_loop(movement_event_t event, movement_settings_t *settings
                     watch_display_string("no LEd", 4);
                 }
                 break;
-            case 5:
+            case 6:
                 sprintf(buf, "%2d", settings->bit.led_green_color);
                 watch_display_string(buf, 8);
                 break;
-            case 6:
+            case 7:
                 sprintf(buf, "%2d", settings->bit.led_red_color);
                 watch_display_string(buf, 8);
                 break;
@@ -178,7 +188,7 @@ bool preferences_face_loop(movement_event_t event, movement_settings_t *settings
     }
 
     // on LED color select screns, preview the color.
-    if (current_page >= 5) {
+    if (current_page >= 6) {
         watch_set_led_color(settings->bit.led_red_color ? (0xF | settings->bit.led_red_color << 4) : 0,
                             settings->bit.led_green_color ? (0xF | settings->bit.led_green_color << 4) : 0);
         // return false so the watch stays awake (needed for the PWM driver to function).
