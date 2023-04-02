@@ -471,8 +471,13 @@ bool app_loop(void) {
         event.subsecond = 0;
         event.event_type = EVENT_ACTIVATE;
         movement_state.watch_face_changed = false;
+        //TESTING BUG persists when line:
+        /* movement_state.prev_watch_face = (movement_state.current_watch_face); */
+        // placed here
     }
 
+    // TODO REVIEW turn off led when changing faces?
+    //                  do this above instead?
     // if the LED should be off, turn it off
     if (movement_state.light_ticks == 0) {
         // unless the user is holding down the LIGHT button, in which case, give them more time.
