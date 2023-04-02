@@ -157,6 +157,17 @@ bool simple_clock_face_loop(movement_event_t event, movement_settings_t *setting
             if (state->signal_enabled) watch_set_indicator(WATCH_INDICATOR_BELL);
             else watch_clear_indicator(WATCH_INDICATOR_BELL);
             break;
+        // added to work with move_to_prev_face()
+        case EVENT_LIGHT_BUTTON_DOWN:
+            break;
+        // added to work with move_to_prev_face()
+        case EVENT_LIGHT_BUTTON_UP:
+            movement_illuminate_led();
+            break;
+        // added to work with move_to_prev_face()
+        case EVENT_LIGHT_LONG_PRESS:
+            movement_illuminate_led();
+            break;
         case EVENT_BACKGROUND_TASK:
             // uncomment this line to snap back to the clock face when the hour signal sounds:
             // movement_move_to_face(state->watch_face_index);
