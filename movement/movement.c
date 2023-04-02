@@ -25,9 +25,34 @@
 // REVIEW
 // Keep in range 30-64
 // #define MOVEMENT_LONG_PRESS_TICKS 64  // .5
-// #define MOVEMENT_LONG_PRESS_TICKS 30  // .234
-// #define MOVEMENT_LONG_PRESS_TICKS 45  // .375
 #define MOVEMENT_LONG_PRESS_TICKS 58  // .45
+// #define MOVEMENT_LONG_PRESS_TICKS 53  // .41
+// #define MOVEMENT_LONG_PRESS_TICKS 48  // .375
+// #define MOVEMENT_LONG_PRESS_TICKS 42  // .33
+// #define MOVEMENT_LONG_PRESS_TICKS 38  // .3
+// #define MOVEMENT_LONG_PRESS_TICKS 32  // .25
+// #define MOVEMENT_LONG_PRESS_TICKS 30  // .234
+
+// TODO list for prefs to iterate over
+// Formula: 64 - (4 * [0..7])
+// #define MOVEMENT_LONG_PRESS_TICKS 64  // .5
+// #define MOVEMENT_LONG_PRESS_TICKS 60  // .47
+// #define MOVEMENT_LONG_PRESS_TICKS 56  // .44
+// #define MOVEMENT_LONG_PRESS_TICKS 52  // .4
+// #define MOVEMENT_LONG_PRESS_TICKS 48  // .375
+// #define MOVEMENT_LONG_PRESS_TICKS 44  // .34
+// #define MOVEMENT_LONG_PRESS_TICKS 40  // .31
+// #define MOVEMENT_LONG_PRESS_TICKS 36  // .28
+
+// Alternate formula: 64 - (5 * [0..7])
+// #define MOVEMENT_LONG_PRESS_TICKS 64  // .5
+// #define MOVEMENT_LONG_PRESS_TICKS 59
+// #define MOVEMENT_LONG_PRESS_TICKS 54
+// #define MOVEMENT_LONG_PRESS_TICKS 49
+// #define MOVEMENT_LONG_PRESS_TICKS 44
+// #define MOVEMENT_LONG_PRESS_TICKS 39
+// #define MOVEMENT_LONG_PRESS_TICKS 34
+// #define MOVEMENT_LONG_PRESS_TICKS 29  // .226
 
 #include <stdio.h>
 #include <string.h>
