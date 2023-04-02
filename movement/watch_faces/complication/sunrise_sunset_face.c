@@ -69,9 +69,10 @@ static void _sunrise_sunset_face_update(movement_settings_t *settings, sunrise_s
     // sunriset returns the rise/set times as signed decimal hours in UTC.
     // this can mean hours below 0 or above 31, which won't fit into a watch_date_time struct.
     // to deal with this, we set aside the offset in hours, and add it back before converting it to a watch_date_time.
-    // NOTE vewy suspicious
-    //          also, why / 60 ?
     double hours_from_utc = ((double)movement_timezone_offsets[settings->bit.time_zone]) / 60.0;
+
+    //TESTING
+    bool first_loop = true;
 
     // we loop twice because if it's after sunset today, we need to recalculate to display values for tomorrow.
     for(int i = 0; i < 2; i++) {
@@ -88,6 +89,13 @@ static void _sunrise_sunset_face_update(movement_settings_t *settings, sunrise_s
 
         watch_set_colon();
         if (settings->bit.clock_mode_24h) watch_set_indicator(WATCH_INDICATOR_24H);
+
+        //TESTING gotta check this
+        //sets scratch_time.unit.day to correct(?) value ?
+        //  still need to incorporate adding 24hrs for following day though
+        if (first_loop) {
+            scratch_time.reg = date_time.reg;
+        }
 
         rise += hours_from_utc;
         set += hours_from_utc;
@@ -118,6 +126,10 @@ static void _sunrise_sunset_face_update(movement_settings_t *settings, sunrise_s
             } else {
                 show_next_match = true;
             }
+        //TESTING
+        } else {
+            sprintf(buf, "%s%2d noPe ", "rI", scratch_time.unit.day);
+            watch_display_string(buf, 0);
         }
 
         minutes = 60.0 * fmod(set, 1);
@@ -146,12 +158,18 @@ static void _sunrise_sunset_face_update(movement_settings_t *settings, sunrise_s
             } else {
                 show_next_match = true;
             }
+        //TESTING
+        } else {
+            sprintf(buf, "%s%2d noPe ", "SE", scratch_time.unit.day);
+            watch_display_string(buf, 0);
         }
 
         // it's after sunset. we need to display sunrise/sunset for tomorrow.
         uint32_t timestamp = watch_utility_date_time_to_unix_time(utc_now, 0);
         timestamp += 86400;
         scratch_time = watch_utility_date_time_from_unix_time(timestamp, 0);
+        //TESTING
+        first_loop = false;
     }
 }
 
