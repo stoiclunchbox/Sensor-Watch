@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) <#year#> <#author_name#>
+ * Copyright (c) <#year#> <#author_name#>  TODO
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,44 +22,42 @@
  * SOFTWARE.
  */
 
-#ifndef memory_device_FACE_H_
-#define memory_device_FACE_H_
+#ifndef recycle_bin_FACE_H_
+#define recycle_bin_FACE_H_
 
 #include "movement.h"
 
 /*
  * A DESCRIPTION OF YOUR WATCH FACE
  *
- * TODO a description of how use it
+ * and a description of how use it  TODO
  *
  */
 
-#define CARDS  9        // no of available pages (max. 16)
-
+// TODO cleanup this struct
+//          we shouldn't need all this, it was probably only
+//          necessary because I was doing things I shouldn't.
 typedef struct {
-    uint8_t pos[6];
-    uint8_t slot_idx : 3;
-} card_data_t;
+    watch_date_time datetime_start;
+    watch_date_time datetime_now;
+    uint32_t int_start;
+    uint32_t int_now;
+    uint32_t int_difference;
+    bool bin_week;
+} recycle_bin_state_t;
 
-typedef struct {
-    card_data_t card[CARDS];
-    uint8_t card_idx : 4;
-    const char *alphanums;
-    const char *nums;
-} memory_device_state_t;
+void recycle_bin_face_setup(movement_settings_t *settings, uint8_t watch_face_index, void ** context_ptr);
+void recycle_bin_face_activate(movement_settings_t *settings, void *context);
+bool recycle_bin_face_loop(movement_event_t event, movement_settings_t *settings, void *context);
+void recycle_bin_face_resign(movement_settings_t *settings, void *context);
 
-void memory_device_face_setup(movement_settings_t *settings, uint8_t watch_face_index, void ** context_ptr);
-void memory_device_face_activate(movement_settings_t *settings, void *context);
-bool memory_device_face_loop(movement_event_t event, movement_settings_t *settings, void *context);
-void memory_device_face_resign(movement_settings_t *settings, void *context);
-
-#define memory_device_face ((const watch_face_t){ \
-    memory_device_face_setup, \
-    memory_device_face_activate, \
-    memory_device_face_loop, \
-    memory_device_face_resign, \
+#define recycle_bin_face ((const watch_face_t){ \
+    recycle_bin_face_setup, \
+    recycle_bin_face_activate, \
+    recycle_bin_face_loop, \
+    recycle_bin_face_resign, \
     NULL, \
 })
 
-#endif // memory_device_FACE_H_
+#endif // recycle_bin_FACE_H_
 

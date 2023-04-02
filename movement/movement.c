@@ -28,7 +28,7 @@
 // #define MOVEMENT_LONG_PRESS_TICKS 59  // .46
 // #define MOVEMENT_LONG_PRESS_TICKS 54  // .42
 // #define MOVEMENT_LONG_PRESS_TICKS 49  // .38
-// #define MOVEMENT_LONG_PRESS_TICKS 44  // .34
+// #define MOVEMENT_LONG_PRESS_TICKS 44  // .34  // looking good!
 // #define MOVEMENT_LONG_PRESS_TICKS 39  // .30
 // #define MOVEMENT_LONG_PRESS_TICKS 34  // .26
 // #define MOVEMENT_LONG_PRESS_TICKS 29  // .22
@@ -87,6 +87,9 @@ watch_date_time scheduled_tasks[MOVEMENT_NUM_FACES];
 // REVIEW new values
 const int32_t movement_le_inactivity_deadlines[8] = {INT_MAX, 3600, 7200, 10800, 21600, 43200, 86400, 259200};
 const int16_t movement_timeout_inactivity_deadlines[4] = {60, 120, 300, 1800};
+/* const int16_t movement_led_time_ticks[4] = {0, 96, 192, 1536};  // off, .75, 1.5 & 12 */
+// REVIEW
+const int16_t movement_led_time_ticks[4] = {96, 192, 512, 1920};  // .75, 1.5, 4 & 15
 movement_event_t event;
 
 const int16_t movement_timezone_offsets[] = {
@@ -221,17 +224,20 @@ void movement_request_tick_frequency(uint8_t freq) {
     watch_rtc_register_periodic_callback(cb_tick, freq);
 }
 
+/* void movement_illuminate_led(void) { */
+/*     if (movement_state.settings.bit.led_duration) { */
+/*         watch_set_led_color(movement_state.settings.bit.led_red_color ? (0xF | movement_state.settings.bit.led_red_color << 4) : 0, */
+/*                             movement_state.settings.bit.led_green_color ? (0xF | movement_state.settings.bit.led_green_color << 4) : 0); */
+/*         movement_state.light_ticks = (movement_state.settings.bit.led_duration * 2 - 1) * 128;      // original */
+/*         _movement_enable_fast_tick_if_needed(); */
+/*     } */
+/* } */
+// REVIEW allow 4 duration settings for led, remove option for no led
 void movement_illuminate_led(void) {
-    if (movement_state.settings.bit.led_duration) {
-        watch_set_led_color(movement_state.settings.bit.led_red_color ? (0xF | movement_state.settings.bit.led_red_color << 4) : 0,
-                            movement_state.settings.bit.led_green_color ? (0xF | movement_state.settings.bit.led_green_color << 4) : 0);
-        //WIP temporary improvement
-        //      aiming for 1.5-2 secs of illumination
-        //      don't forget to update preferences_face.c if numbers end up changed significantly
-        /* movement_state.light_ticks = (movement_state.settings.bit.led_duration * 2 - 1) * 128; */
-        movement_state.light_ticks = (movement_state.settings.bit.led_duration) * 128 * 1.5;
-        _movement_enable_fast_tick_if_needed();
-    }
+    watch_set_led_color(movement_state.settings.bit.led_red_color ? (0xF | movement_state.settings.bit.led_red_color << 4) : 0,
+                        movement_state.settings.bit.led_green_color ? (0xF | movement_state.settings.bit.led_green_color << 4) : 0);
+    movement_state.light_ticks = movement_led_time_ticks[movement_state.settings.bit.led_duration];  // formula: ticks / 128 = seconds_duration
+    _movement_enable_fast_tick_if_needed();
 }
 
 bool movement_default_loop_handler(movement_event_t event, movement_settings_t *settings) {
@@ -239,8 +245,6 @@ bool movement_default_loop_handler(movement_event_t event, movement_settings_t *
 
     switch (event.event_type) {
         case EVENT_MODE_BUTTON_UP:
-            //BUG offset works correctly for main rotation but returns 2 faces early on alt rotation
-            movement_state.prev_watch_face = (movement_state.current_watch_face + 1);
             movement_move_to_next_face();
             break;
         // WIP original function
@@ -336,8 +340,10 @@ void movement_play_alarm(void) {
 
 void movement_play_alarm_beeps(uint8_t rounds, BuzzerNote alarm_note) {
     if (rounds == 0) rounds = 1;
-    // REVIEW increase this?
+    // WIP increase this?
     /* if (rounds > 20) rounds = 20; */
+    // REVIEW trial to make sure longer durations don't cause issues
+    //          especially durations over a minute
     if (rounds > 50) rounds = 50;
     movement_request_wake();
     movement_state.alarm_note = alarm_note;
@@ -366,7 +372,7 @@ void app_init(void) {
     movement_state.settings.bit.le_interval = 1;
     movement_state.settings.bit.to_interval = 1;
     movement_state.settings.bit.led_duration = 1;
-    movement_state.settings.bit.long_press_duration = 0;
+    movement_state.settings.bit.long_press_duration = 4;
     movement_state.light_ticks = -1;
     movement_state.alarm_ticks = -1;
     movement_state.next_available_backup_register = 4;
@@ -464,10 +470,12 @@ static void _sleep_mode_app_loop(void) {
 
 bool app_loop(void) {
     if (movement_state.watch_face_changed) {
+        watch_set_led_off();  // turn off led when changing faces
         if (movement_state.settings.bit.button_should_sound) {
             // low note for nonzero case, high note for return to watch_face 0
             watch_buzzer_play_note(movement_state.next_watch_face ? BUZZER_NOTE_C7 : BUZZER_NOTE_C8, 50);
         }
+        movement_state.prev_watch_face = (movement_state.current_watch_face);
         watch_faces[movement_state.current_watch_face].resign(&movement_state.settings, watch_face_contexts[movement_state.current_watch_face]);
         movement_state.current_watch_face = movement_state.next_watch_face;
         watch_clear_display();
@@ -476,13 +484,8 @@ bool app_loop(void) {
         event.subsecond = 0;
         event.event_type = EVENT_ACTIVATE;
         movement_state.watch_face_changed = false;
-        //TESTING BUG persists when line:
-        /* movement_state.prev_watch_face = (movement_state.current_watch_face); */
-        // placed here
     }
 
-    // TODO REVIEW turn off led when changing faces?
-    //                  do this above instead?
     // if the LED should be off, turn it off
     if (movement_state.light_ticks == 0) {
         // unless the user is holding down the LIGHT button, in which case, give them more time.

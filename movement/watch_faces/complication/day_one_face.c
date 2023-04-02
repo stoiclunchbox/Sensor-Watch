@@ -38,9 +38,9 @@ static void _day_one_face_update(day_one_state_t state) {
     uint32_t julian_date = _day_one_face_juliandaynum(date_time.unit.year + WATCH_RTC_REFERENCE_YEAR, date_time.unit.month, date_time.unit.day);
     uint32_t julian_birthdate = _day_one_face_juliandaynum(state.birth_year, state.birth_month, state.birth_day);
     if (julian_date < julian_birthdate) {
-    	sprintf(buf, "DA  %6lu", julian_birthdate - julian_date);
+        sprintf(buf, "DO  %6lu", julian_birthdate - julian_date);
     } else {
-    	sprintf(buf, "DA  %6lu", julian_date - julian_birthdate);
+        sprintf(buf, "DO  %6lu", julian_date - julian_birthdate);
     }
     watch_display_string(buf, 0);
 }
@@ -56,9 +56,9 @@ void day_one_face_setup(movement_settings_t *settings, uint8_t watch_face_index,
             // if birth date is totally blank, set a reasonable starting date. this works well for anyone under 63, but
             // you can keep pressing to go back to 1900; just pass the current year. also picked this date because if you
             // set it to 1959-01-02, it counts up from the launch of Luna-1, the first spacecraft to leave the well.
-            movement_birthdate.bit.year = 1991;
-            movement_birthdate.bit.month = 10;
-            movement_birthdate.bit.day = 25;
+            movement_birthdate.bit.year = 2023;
+            movement_birthdate.bit.month = 3;
+            movement_birthdate.bit.day = 23;
             watch_store_backup_data(movement_birthdate.reg, 2);
         }
     }
@@ -174,9 +174,10 @@ bool day_one_face_loop(movement_event_t event, movement_settings_t *settings, vo
             break;
         case EVENT_TIMEOUT:
             // return home if we're on a settings page (this saves our changes when we resign).
-            if (state->current_page != 0) {
-                movement_move_to_face(0);
-            }
+            /* if (state->current_page != 0) { */
+            /*     movement_move_to_face(0); */
+            /* } */
+            movement_move_to_face(0);
             break;
         default:
             movement_default_loop_handler(event, settings);

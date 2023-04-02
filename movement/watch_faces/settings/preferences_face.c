@@ -34,7 +34,7 @@ const char preferences_face_titles[PREFERENCES_FACE_NUM_PREFEFENCES][11] = {
     "LE        ",   // Low Energy mode: how long before it engages?
     // REVIEW I had hoped to find a better label
     "BL     Sec",   // Button Long press: duration (in seconds)
-    "LT        ",   // Light: duration
+    "LT     SeC",   // Light: duration
 #ifdef WATCH_IS_BLUE_BOARD
     "LT   blu  ",   // Light: blue component (for watches with blue LED)
 #else
@@ -163,17 +163,32 @@ bool preferences_face_loop(movement_event_t event, movement_settings_t *settings
                         break;
                 }
                 break;
-            // REVIEW
             case 4:
                 sprintf(buf, ".%-2d", (64 - (5 * settings->bit.long_press_duration)) * 100 / 128);
                 watch_display_string(buf, 4);
                 break;
             case 5:
-                if (settings->bit.led_duration) {
-                    sprintf(buf, " %1d SeC", settings->bit.led_duration * 2 - 1);
-                    watch_display_string(buf, 4);
-                } else {
-                    watch_display_string("no LEd", 4);
+                /* if (settings->bit.led_duration) { */
+                /*     sprintf(buf, " %1d SeC", settings->bit.led_duration * 2 - 1); */
+                /*     watch_display_string(buf, 4); */
+                /* } else { */
+                /*     watch_display_string("no LEd", 4); */
+                /* } */
+                /* break; */
+                // REVIEW
+                switch (settings->bit.led_duration) {
+                    case 0:
+                        watch_display_string(".75SeC", 4);
+                        break;
+                    case 1:
+                        watch_display_string("1.5SeC", 4);
+                        break;
+                    case 2:
+                        watch_display_string("4  SeC", 4);
+                        break;
+                    case 3:
+                        watch_display_string("15 SeC", 4);
+                        break;
                 }
                 break;
             case 6:

@@ -37,7 +37,10 @@ const char *pi_data[] = {
     "HE", "HEgH",
 
     "DB", "ntroPy",
-    "4 ", "128",
+    "2 ", "4",
+    "3 ", "8",
+    "4 ", "16",
+    "6 ", "64",
     "8 ", "255",
     "Nt", "16    65536",
     "Nt", "32    4-29H9  4294967296",
@@ -144,14 +147,12 @@ bool databank_face_loop(movement_event_t event, movement_settings_t *settings, v
             display();
             break;
         case EVENT_ALARM_LONG_PRESS:
-            databank_state.databank_page = (databank_state.databank_page + 1) % databank_num_pages;
-            databank_state.current_word = 0;
+            databank_state.current_word = (databank_state.current_word + 1) % max_words;
             display();
             break;
         case EVENT_ALARM_BUTTON_UP:
-            // when the user presses 'alarm', we toggle the state of the animation. If animating,
-            // we stop; if stopped, we resume.
-            databank_state.current_word = (databank_state.current_word + 1) % max_words;
+            databank_state.databank_page = (databank_state.databank_page + 1) % databank_num_pages;
+            databank_state.current_word = 0;
             display();
             break;
         case EVENT_LOW_ENERGY_UPDATE:

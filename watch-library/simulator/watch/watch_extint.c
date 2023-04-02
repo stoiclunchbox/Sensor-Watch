@@ -50,18 +50,36 @@ static EM_BOOL watch_invoke_key_callback(int eventType, const EmscriptenKeyboard
     const char *key = keyEvent->key;
     if (key[1] != 0) return EM_FALSE;
 
+    /* uint8_t button_id; */
+    /* switch (key[0]) { */
+    /*     case 'A': */
+    /*     case 'a': */
+    /*         button_id = BTN_ID_ALARM; */
+    /*         break; */
+    /*     case 'L': */
+    /*     case 'l': */
+    /*         button_id = BTN_ID_LIGHT; */
+    /*         break; */
+    /*     case 'M': */
+    /*     case 'm': */
+    /*         button_id = BTN_ID_MODE; */
+    /*         break; */
+    /*     default: */
+    /*         return EM_FALSE; */
+    /* } */
+
     uint8_t button_id;
     switch (key[0]) {
-        case 'A':
-        case 'a':
+        case 'G':
+        case 'g':
             button_id = BTN_ID_ALARM;
             break;
-        case 'L':
-        case 'l':
+        case 'R':
+        case 'r':
             button_id = BTN_ID_LIGHT;
             break;
-        case 'M':
-        case 'm':
+        case 'F':
+        case 'f':
             button_id = BTN_ID_MODE;
             break;
         default:

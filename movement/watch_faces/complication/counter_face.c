@@ -28,12 +28,14 @@
 #include "watch.h"
 
 void counter_face_setup(movement_settings_t *settings, uint8_t watch_face_index, void ** context_ptr) {
-    (void) settings;
     (void) watch_face_index;
     if (*context_ptr == NULL) {
         *context_ptr = malloc(sizeof(counter_state_t));
         memset(*context_ptr, 0, sizeof(counter_state_t));
     }
+    counter_state_t *state = (counter_state_t *)*context_ptr;
+    if (!settings->bit.button_should_sound) state->counter_beeps = 0;
+    else state->counter_beeps = 1;
 }
 
 void counter_face_activate(movement_settings_t *settings, void *context) {
@@ -43,36 +45,33 @@ void counter_face_activate(movement_settings_t *settings, void *context) {
 
 bool counter_face_loop(movement_event_t event, movement_settings_t *settings, void *context) {
     (void) settings;
-
     counter_state_t *state = (counter_state_t *)context;
 
     switch (event.event_type) {
-        case EVENT_ALARM_BUTTON_UP:
-            state->counter_idx++; // increment counter index
-            if (state->counter_idx>99) { //0-99
-                state->counter_idx=0;//reset counter index
-            }
-            print_counter(state);
-            /* beep_counter(state); */
-            break;
-        // WIP
-        case EVENT_LIGHT_LONG_PRESS:
-            state->counter_idx--; // decrement counter index
-            if (state->counter_idx>99) { //0-99
-                state->counter_idx=0;//reset counter index
-            }
-            print_counter(state);
-            /* beep_counter(state); */
-            break;
-        case EVENT_ALARM_LONG_PRESS:
-            state->counter_idx=0; // reset counter index
-            print_counter(state);
-            break;
         case EVENT_ACTIVATE:
             print_counter(state);
             break;
+        case EVENT_ALARM_BUTTON_UP:  // increment
+            state->counter_idx++;
+            print_counter(state);
+            beep_counter(state);
+            break;
+        case EVENT_LIGHT_LONG_PRESS:  // decrement & beeps toggle
+            if (state->counter_idx == 0) {
+                state->counter_beeps = (!state->counter_beeps);
+                print_counter(state);
+            } else {
+                state->counter_idx--;
+                print_counter(state);
+                beep_counter(state);
+            }
+            break;
+        case EVENT_ALARM_LONG_PRESS:  // reset
+            state->counter_idx=0;
+            print_counter(state);
+            break;
         case EVENT_TIMEOUT:
-            // ignore timeout
+            if (!state->counter_beeps) movement_move_to_face(0);
             break;
         default:
             movement_default_loop_handler(event, settings);
@@ -84,29 +83,44 @@ bool counter_face_loop(movement_event_t event, movement_settings_t *settings, vo
 
 // beep counter index times
 void beep_counter(counter_state_t *state) {
-	
-	int low_count = state->counter_idx/5;
-	int high_count = state->counter_idx - low_count * 5; 
-	
-	for (int i=0; i<low_count; i++) {
-		watch_buzzer_play_note(BUZZER_NOTE_A6, 50);
-	    watch_buzzer_play_note(BUZZER_NOTE_REST, 100);
-	}
-	
-	//sleep between high and low
+
+    if (state->counter_beeps == 0 || state->counter_idx > 99) return;
+
+    int low_count = state->counter_idx/5;
+    int high_count = state->counter_idx - low_count * 5;
+
+    for (int i=0; i<low_count; i++) {
+        watch_buzzer_play_note(BUZZER_NOTE_A6, 50);
+        watch_buzzer_play_note(BUZZER_NOTE_REST, 100);
+    }
+
+    //sleep between high and low
     watch_buzzer_play_note(BUZZER_NOTE_REST, 200);
-	
-	for (int i=0; i<high_count; i++) {
-		watch_buzzer_play_note(BUZZER_NOTE_B6, 50);
-	    watch_buzzer_play_note(BUZZER_NOTE_REST, 100);
-	}
+
+    for (int i=0; i<high_count; i++) {
+        watch_buzzer_play_note(BUZZER_NOTE_B6, 50);
+        watch_buzzer_play_note(BUZZER_NOTE_REST, 100);
+    }
 }
 
 
 // print counter index at the center of display.
 void print_counter(counter_state_t *state) {
     char buf[14];
-    sprintf(buf, "CO    %02d", state->counter_idx); // center of LCD display
+
+    if (state->counter_idx>9999) {
+        state->counter_idx=0;
+    }
+
+    if (state->counter_beeps == 1) {
+        /* sprintf(buf, "CO b%4d", state->counter_idx); */
+    /* } else { */
+        /* sprintf(buf, "CO  %4d", state->counter_idx); */
+    // REVIEW gotta decide if i like CO or TA more
+        sprintf(buf, "TA b%4d", state->counter_idx);
+    } else {
+        sprintf(buf, "TA  %4d", state->counter_idx);
+    }
     watch_display_string(buf, 0);
 }
 

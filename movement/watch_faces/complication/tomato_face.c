@@ -27,7 +27,7 @@
 #include "tomato_face.h"
 #include "watch_utility.h"
 
-static uint8_t focus_min = 25;
+static uint8_t focus_min = 10;
 static uint8_t break_min = 5;
 
 static inline int32_t get_tz_offset(movement_settings_t *settings) {
@@ -97,7 +97,7 @@ static void tomato_draw(tomato_state_t *state) {
             sec = 0;
             break;
     }
-    sprintf(buf, "TO %c%2d%02d%2d", kind, min, sec, state->done_count);
+    sprintf(buf, "PD %c%2d%02d%2d", kind, min, sec, state->done_count);
     watch_display_string(buf, 0);
 }
 
@@ -206,7 +206,7 @@ bool tomato_face_loop(movement_event_t event, movement_settings_t *settings, voi
             tomato_draw(state);
             break;
         case EVENT_TIMEOUT:
-            movement_move_to_face(0);
+            if (state->mode != tomato_run) movement_move_to_face(0);
             break;
         default:
             movement_default_loop_handler(event, settings);

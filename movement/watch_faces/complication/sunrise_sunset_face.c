@@ -71,9 +71,6 @@ static void _sunrise_sunset_face_update(movement_settings_t *settings, sunrise_s
     // to deal with this, we set aside the offset in hours, and add it back before converting it to a watch_date_time.
     double hours_from_utc = ((double)movement_timezone_offsets[settings->bit.time_zone]) / 60.0;
 
-    //TESTING
-    bool first_loop = true;
-
     // we loop twice because if it's after sunset today, we need to recalculate to display values for tomorrow.
     for(int i = 0; i < 2; i++) {
         uint8_t result = sun_rise_set(scratch_time.unit.year + WATCH_RTC_REFERENCE_YEAR, scratch_time.unit.month, scratch_time.unit.day, lon, lat, &rise, &set);
@@ -90,15 +87,13 @@ static void _sunrise_sunset_face_update(movement_settings_t *settings, sunrise_s
         watch_set_colon();
         if (settings->bit.clock_mode_24h) watch_set_indicator(WATCH_INDICATOR_24H);
 
-        //TESTING gotta check this
-        //sets scratch_time.unit.day to correct(?) value ?
-        //  still need to incorporate adding 24hrs for following day though
-        if (first_loop) {
-            scratch_time.reg = date_time.reg;
-        }
-
         rise += hours_from_utc;
         set += hours_from_utc;
+
+        // set scratch_time.unit.day to the current day in local time
+        uint32_t timestamp_localtime = watch_utility_date_time_to_unix_time(scratch_time, 0);
+        timestamp_localtime += (hours_from_utc * 3200);
+        scratch_time = watch_utility_date_time_from_unix_time(timestamp_localtime, 0);
 
         minutes = 60.0 * fmod(rise, 1);
         seconds = 60.0 * fmod(minutes, 1);
@@ -110,7 +105,6 @@ static void _sunrise_sunset_face_update(movement_settings_t *settings, sunrise_s
             scratch_time.unit.minute = 0;
             scratch_time.unit.hour = (scratch_time.unit.hour + 1) % 24;
         }
-        // scratch_time now contains rise time in local time
 
         if (date_time.reg < scratch_time.reg) _sunrise_sunset_set_expiration(state, scratch_time);
 
@@ -126,10 +120,6 @@ static void _sunrise_sunset_face_update(movement_settings_t *settings, sunrise_s
             } else {
                 show_next_match = true;
             }
-        //TESTING
-        } else {
-            sprintf(buf, "%s%2d noPe ", "rI", scratch_time.unit.day);
-            watch_display_string(buf, 0);
         }
 
         minutes = 60.0 * fmod(set, 1);
@@ -142,7 +132,6 @@ static void _sunrise_sunset_face_update(movement_settings_t *settings, sunrise_s
             scratch_time.unit.minute = 0;
             scratch_time.unit.hour = (scratch_time.unit.hour + 1) % 24;
         }
-        // scratch_time now contains SET time in local time
 
         if (date_time.reg < scratch_time.reg) _sunrise_sunset_set_expiration(state, scratch_time);
 
@@ -158,18 +147,12 @@ static void _sunrise_sunset_face_update(movement_settings_t *settings, sunrise_s
             } else {
                 show_next_match = true;
             }
-        //TESTING
-        } else {
-            sprintf(buf, "%s%2d noPe ", "SE", scratch_time.unit.day);
-            watch_display_string(buf, 0);
         }
 
         // it's after sunset. we need to display sunrise/sunset for tomorrow.
         uint32_t timestamp = watch_utility_date_time_to_unix_time(utc_now, 0);
         timestamp += 86400;
         scratch_time = watch_utility_date_time_from_unix_time(timestamp, 0);
-        //TESTING
-        first_loop = false;
     }
 }
 
@@ -309,6 +292,25 @@ void sunrise_sunset_face_setup(movement_settings_t *settings, uint8_t watch_face
     if (*context_ptr == NULL) {
         *context_ptr = malloc(sizeof(sunrise_sunset_state_t));
         memset(*context_ptr, 0, sizeof(sunrise_sunset_state_t));
+        sunrise_sunset_state_t *state = (sunrise_sunset_state_t *)*context_ptr;
+
+        //set default lat/lon & write to register
+        state->working_latitude.sign        = 1;
+        state->working_latitude.hundreds    = 0;
+        state->working_latitude.tens        = 2;
+        state->working_latitude.ones        = 7;
+        state->working_latitude.tenths      = 4;
+        state->working_latitude.hundredths  = 0;
+
+        state->working_longitude.sign       = 0;
+        state->working_longitude.hundreds   = 1;
+        state->working_longitude.tens       = 5;
+        state->working_longitude.ones       = 3;
+        state->working_longitude.tenths     = 0;
+        state->working_longitude.hundredths = 9;
+
+        state->location_changed = true;
+        _sunrise_sunset_face_update_location_register(state);
     }
 }
 
@@ -398,16 +400,18 @@ bool sunrise_sunset_face_loop(movement_event_t event, movement_settings_t *setti
             }
             break;
         case EVENT_TIMEOUT:
-            if (watch_get_backup_data(1) == 0) {
-                // if no location set, return home
-                movement_move_to_face(0);
-            } else if (state->page || state->rise_index) {
-                // otherwise on timeout, exit settings mode and return to the next sunrise or sunset
-                state->page = 0;
-                state->rise_index = 0;
-                movement_request_tick_frequency(1);
-                _sunrise_sunset_face_update(settings, state);
-            }
+            /* if (watch_get_backup_data(1) == 0) { */
+            /*     // if no location set, return home */
+            /*     movement_move_to_face(0); */
+            /* } else if (state->page || state->rise_index) { */
+            /*     // otherwise on timeout, exit settings mode and return to the next sunrise or sunset */
+            /*     state->page = 0; */
+            /*     state->rise_index = 0; */
+            /*     movement_request_tick_frequency(1); */
+            /*     _sunrise_sunset_face_update(settings, state); */
+            /* } */
+            // just timeout instead
+            movement_move_to_face(0);
             break;
         default:
             return movement_default_loop_handler(event, settings);

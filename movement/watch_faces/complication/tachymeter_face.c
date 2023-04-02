@@ -48,6 +48,8 @@ void tachymeter_face_setup(movement_settings_t *settings, uint8_t watch_face_ind
         // Default distance
         state->dist_digits.ones = 1;
         state->distance = _distance_from_struct(state->dist_digits);
+
+        state->results_show_time = false;
     }
 }
 
@@ -65,9 +67,10 @@ static void _tachymeter_face_distance_lcd(movement_event_t event, tachymeter_sta
     // Blinking display when editing
     if (state->editing) {
         // Blink 'd'
-        if (event.subsecond < 2) {
-            buf[3] = ' ';
-        }
+        // REVIEW don't blink 'd'
+        /* if (event.subsecond < 2) { */
+        /*     buf[3] = ' '; */
+        /* } */
         // Blink active digit
         if (event.subsecond % 2) {
             buf[state->active_digit + 4] = ' ';
@@ -94,6 +97,7 @@ static void _tachymeter_face_totals_lcd(tachymeter_state_t *state, bool show_tim
 bool tachymeter_face_loop(movement_event_t event, movement_settings_t *settings, void *context) {
     (void)settings;
     tachymeter_state_t *state = (tachymeter_state_t *)context;
+
     switch (event.event_type) {
         case EVENT_ACTIVATE:
             // Show distance in UI
@@ -108,11 +112,11 @@ bool tachymeter_face_loop(movement_event_t event, movement_settings_t *settings,
             }
             if (!state->running && state->total_time != 0) {
             // Display results if finished and not cleared
-                if (event.subsecond < 2) {
-                     _tachymeter_face_totals_lcd(state, true);
-                } else {
-                     _tachymeter_face_totals_lcd(state, false);
-                }
+                /* if (event.subsecond < 2) { */
+                /*      _tachymeter_face_totals_lcd(state, true); */
+                /* } else { */
+                /*      _tachymeter_face_totals_lcd(state, false); */
+                /* } */
             } else if (state->running){
                 watch_display_string("  ", 2);
                 switch (state->animation_state) {
@@ -212,6 +216,10 @@ bool tachymeter_face_loop(movement_event_t event, movement_settings_t *settings,
                 state->total_time = ((now_timestamp*100) + (event.subsecond*25)) - ((start_timestamp*100) + (state->start_subsecond*25));
                 // Total speed in distance units per hour
                 state->total_speed = (uint32_t)(3600 * 100 * state->distance / state->total_time);
+                _tachymeter_face_totals_lcd(state, state->results_show_time);
+            } else {
+                state->results_show_time = (!state->results_show_time);
+                _tachymeter_face_totals_lcd(state, state->results_show_time);
             }
             break;
         case EVENT_ALARM_LONG_PRESS:
@@ -219,7 +227,7 @@ bool tachymeter_face_loop(movement_event_t event, movement_settings_t *settings,
                 if (!state->editing) {
                     // Enter editing
                     state->editing = true;
-                    state->active_digit = 0;
+                    state->active_digit = 3;
                     if (settings->bit.button_should_sound) {
                         watch_buzzer_play_note(BUZZER_NOTE_C7, 80);
                         watch_buzzer_play_note(BUZZER_NOTE_C8, 80);
@@ -242,7 +250,7 @@ bool tachymeter_face_loop(movement_event_t event, movement_settings_t *settings,
         case EVENT_TIMEOUT:
             // Your watch face will receive this event after a period of inactivity. If it makes sense to resign,
             // you may uncomment this line to move back to the first watch face in the list:
-            movement_move_to_face(0);
+            if (!state->running) movement_move_to_face(0);
             break;
         case EVENT_LOW_ENERGY_UPDATE:
             // If you did not resign in EVENT_TIMEOUT, you can use this event to update the display once a minute.

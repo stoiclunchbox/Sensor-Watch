@@ -29,51 +29,51 @@
 
 const watch_face_t watch_faces[] = {
     simple_clock_face,
-    world_clock2_face,
+    //INTERNAL
     stock_stopwatch_face,
     timer_face,
+    alarm_face,
     counter_face,
-    sunrise_sunset_face,
-    moon_phase_face,
-    //tide clock
+    //water
     thermistor_readout_face,
     ratemeter_face,
     pulsometer_face,
     tachymeter_face,
-    day_one_face,
+    //telemeter
+        //TIME PASSAGE
+        day_one_face,
+        time_left_face,
+        //actual time left?
     tomato_face,
     probability_face,
     databank_face,
-    totp_face,
-        totp_face_lfs,
         rpn_calculator_face,
         rpn_calculator_alt_face,
-        habit_face,
-        time_left_face,
+        habit_face, //work out if I want to keep / use
         interval_face,
         ships_bell_face,
 
     memory_device_face,
-    alarm_face,
+    //EXTERNAL
+    world_clock2_face,
+    sunrise_sunset_face,
+    moon_phase_face,
+    //tide clock
+    //due (rubbish bin)
+    recycle_bin_face,
     preferences_face,
     set_time_face,
     voltage_face,
     finetune_face,
     nanosec_face,
+        thermistor_logging_face,
+    totp_face,
+    totp_face_lfs,
         character_set_face,
         chirpy_demo_face,
-        thermistor_logging_face,
-        tempchart_face,
 };
 
 #define MOVEMENT_NUM_FACES (sizeof(watch_faces) / sizeof(watch_face_t))
-
-/* Determines what face to go to from the first face if you've already set 
- * a mode long press to go to the first face in preferences, and
- * excludes these faces from the normal rotation.
- * Usually it makes sense to set this to the preferences face.
- */
-/* #define MOVEMENT_SECONDARY_FACE_INDEX 0 // or (MOVEMENT_NUM_FACES - 2) */
-#define MOVEMENT_SECONDARY_FACE_INDEX (MOVEMENT_NUM_FACES - 11)
+#define MOVEMENT_SECONDARY_FACE_INDEX (MOVEMENT_NUM_FACES - 15)
 
 #endif // MOVEMENT_CONFIG_H_

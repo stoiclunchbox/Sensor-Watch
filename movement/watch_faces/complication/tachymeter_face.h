@@ -37,8 +37,10 @@ typedef struct {
 } distance_digits_t;
 
 typedef struct {
+    // WIP
     bool running;                  // tachymeter status
     bool editing;                  // editing distance
+    bool results_show_time;        // show results as time iead of speed
     uint8_t active_digit;          // active digit at editing distance
     uint8_t animation_state;       // running animation state
     watch_date_time start_seconds; // start_seconds
