@@ -90,19 +90,10 @@ static void _sunrise_sunset_face_update(movement_settings_t *settings, sunrise_s
         rise += hours_from_utc;
         set += hours_from_utc;
 
-        // IMPORTANT FIX I think i found it, but I need to make sure I can
-        // definitley test it correctly
-        // As follows:
-        //      when scratch_time has 24hrs added to it here, it's in UTC time,
-        //      the scratch_time.day remains unchanged
-        //      thus,
-        //      we need to add our timezone offset to it after the sunriset calc, but
-        //      we need to do it in the correct format(s)
-        // TODO make this nice
-        // TZ offset for scratch_time
-        uint32_t ststamp_wip = watch_utility_date_time_to_unix_time(scratch_time, 0);
-        ststamp_wip += (hours_from_utc * 3200);
-        scratch_time = watch_utility_date_time_from_unix_time(ststamp_wip, 0);
+        // set scratch_time.unit.day to the current day in local time
+        uint32_t timestamp_localtime = watch_utility_date_time_to_unix_time(scratch_time, 0);
+        timestamp_localtime += (hours_from_utc * 3200);
+        scratch_time = watch_utility_date_time_from_unix_time(timestamp_localtime, 0);
 
         minutes = 60.0 * fmod(rise, 1);
         seconds = 60.0 * fmod(minutes, 1);
