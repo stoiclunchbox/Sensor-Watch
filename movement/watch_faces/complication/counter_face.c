@@ -48,31 +48,28 @@ bool counter_face_loop(movement_event_t event, movement_settings_t *settings, vo
 
     switch (event.event_type) {
         case EVENT_ALARM_BUTTON_UP:
-            state->counter_idx++; // increment counter index
-            if (state->counter_idx>99) { //0-99
-                state->counter_idx=0;//reset counter index
-            }
+            state->counter_idx++;
             print_counter(state);
-            /* beep_counter(state); */
+            if (settings.bit.button_should_sound) {
+                beep_counter(state);
+            }
             break;
-        // WIP
         case EVENT_LIGHT_LONG_PRESS:
-            state->counter_idx--; // decrement counter index
-            if (state->counter_idx>99) { //0-99
-                state->counter_idx=0;//reset counter index
-            }
+            state->counter_idx--;
             print_counter(state);
-            /* beep_counter(state); */
+            if (settings.bit.button_should_sound) {
+                beep_counter(state);
+            }
             break;
         case EVENT_ALARM_LONG_PRESS:
-            state->counter_idx=0; // reset counter index
+            state->counter_idx=0;
             print_counter(state);
             break;
         case EVENT_ACTIVATE:
             print_counter(state);
             break;
         case EVENT_TIMEOUT:
-            // ignore timeout
+            movement_move_to_face(0);
             break;
         default:
             movement_default_loop_handler(event, settings);
@@ -84,29 +81,34 @@ bool counter_face_loop(movement_event_t event, movement_settings_t *settings, vo
 
 // beep counter index times
 void beep_counter(counter_state_t *state) {
-	
-	int low_count = state->counter_idx/5;
-	int high_count = state->counter_idx - low_count * 5; 
-	
-	for (int i=0; i<low_count; i++) {
-		watch_buzzer_play_note(BUZZER_NOTE_A6, 50);
-	    watch_buzzer_play_note(BUZZER_NOTE_REST, 100);
-	}
-	
-	//sleep between high and low
+    
+    int low_count = state->counter_idx/5;
+    int high_count = state->counter_idx - low_count * 5; 
+    
+    for (int i=0; i<low_count; i++) {
+        watch_buzzer_play_note(BUZZER_NOTE_A6, 50);
+        watch_buzzer_play_note(BUZZER_NOTE_REST, 100);
+    }
+    
+    //sleep between high and low
     watch_buzzer_play_note(BUZZER_NOTE_REST, 200);
-	
-	for (int i=0; i<high_count; i++) {
-		watch_buzzer_play_note(BUZZER_NOTE_B6, 50);
-	    watch_buzzer_play_note(BUZZER_NOTE_REST, 100);
-	}
+    
+    for (int i=0; i<high_count; i++) {
+        watch_buzzer_play_note(BUZZER_NOTE_B6, 50);
+        watch_buzzer_play_note(BUZZER_NOTE_REST, 100);
+    }
 }
 
 
 // print counter index at the center of display.
 void print_counter(counter_state_t *state) {
     char buf[14];
-    sprintf(buf, "CO    %02d", state->counter_idx); // center of LCD display
+
+    if (state->counter_idx>9999) { //0-9999
+        state->counter_idx=0;  //reset counter index
+    }
+
+    sprintf(buf, "CO  %4d", state->counter_idx); // center of LCD display
     watch_display_string(buf, 0);
 }
 
