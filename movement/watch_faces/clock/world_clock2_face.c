@@ -172,7 +172,7 @@ static inline uint8_t find_selected_zone(world_clock2_state_t *state, int direct
     uint8_t i = state->current_zone;
 
     do {
-	i = mod(i + direction, NUM_TIME_ZONES);
+	i = mod(i + direction, NUM_TIME_ZONES);  // NOTE this might be slow
 	/* Could not find a selected zone. Return UTC */
 	if (i == state->current_zone) {
 	    return 0;

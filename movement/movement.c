@@ -28,7 +28,7 @@
 // #define MOVEMENT_LONG_PRESS_TICKS 59  // .46
 // #define MOVEMENT_LONG_PRESS_TICKS 54  // .42
 // #define MOVEMENT_LONG_PRESS_TICKS 49  // .38
-// #define MOVEMENT_LONG_PRESS_TICKS 44  // .34
+// #define MOVEMENT_LONG_PRESS_TICKS 44  // .34  // looking good!
 // #define MOVEMENT_LONG_PRESS_TICKS 39  // .30
 // #define MOVEMENT_LONG_PRESS_TICKS 34  // .26
 // #define MOVEMENT_LONG_PRESS_TICKS 29  // .22
@@ -239,7 +239,9 @@ bool movement_default_loop_handler(movement_event_t event, movement_settings_t *
 
     switch (event.event_type) {
         case EVENT_MODE_BUTTON_UP:
-            //BUG offset works correctly for main rotation but returns 2 faces early on alt rotation
+            //BUG offset works correctly for main rotation
+            //          except for returning to stopwatch (which is 2 faces in, hmmm)
+            //    but returns 2 faces early on alt rotation
             movement_state.prev_watch_face = (movement_state.current_watch_face + 1);
             movement_move_to_next_face();
             break;
