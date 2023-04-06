@@ -39,35 +39,54 @@ static void _memory_device_face_draw(memory_device_state_t *state, uint8_t subse
     char buf[12];
 
     //sanity vars for our mental convenience
-    bool mode = state->card[state->card_idx].mode;
+    uint8_t mode = state->card[state->card_idx].mode;
     uint8_t slot = state->card[state->card_idx].slot_idx;
 
-    if (mode) {
-        if (state->card[state->card_idx].pos[slot] >= 26)
-            state->card[state->card_idx].pos[slot] = 0;
+    switch (mode) {
+        case 0:
+            if (state->card[state->card_idx].pos[slot] >= 27)
+                state->card[state->card_idx].pos[slot] = 0;
 
-        sprintf(buf, "MD%da%d%c %c%c%c",
-                (state->card_idx + 1),
-                (slot + 1),
-                state->alphas[state->card[state->card_idx].pos[0]],
-                state->alphas[state->card[state->card_idx].pos[1]],
-                state->alphas[state->card[state->card_idx].pos[2]],
-                state->alphas[state->card[state->card_idx].pos[3]]
-                );
-    } else {
-        if (state->card[state->card_idx].pos[slot] >= 10)
-            state->card[state->card_idx].pos[slot] = 0;
+            sprintf(buf, "MD%da%d%c %c%c%c",
+                    (state->card_idx + 1),
+                    (slot + 1),
+                    state->alphas[state->card[state->card_idx].pos[0]],
+                    state->alphas[state->card[state->card_idx].pos[1]],
+                    state->alphas[state->card[state->card_idx].pos[2]],
+                    state->alphas[state->card[state->card_idx].pos[3]]
+                    );
+            break;
+        case 1:
+            if (state->card[state->card_idx].pos[slot] >= 10)
+                state->card[state->card_idx].pos[slot] = 0;
 
-        sprintf(buf, "MD%dn%c%c%c%c%2d",
-                (state->card_idx + 1),
-                state->nums[state->card[state->card_idx].pos[0]],
-                state->nums[state->card[state->card_idx].pos[1]],
-                state->nums[state->card[state->card_idx].pos[2]],
-                state->nums[state->card[state->card_idx].pos[3]],
-                (slot + 1)
-                );
+            sprintf(buf, "MD%dn%c%c%c%c%2d",
+                    (state->card_idx + 1),
+                    state->nums[state->card[state->card_idx].pos[0]],
+                    state->nums[state->card[state->card_idx].pos[1]],
+                    state->nums[state->card[state->card_idx].pos[2]],
+                    state->nums[state->card[state->card_idx].pos[3]],
+                    (slot + 1)
+                    );
+            break;
+        case 2:
+            if (state->card[state->card_idx].pos[slot] >= 16)
+                state->card[state->card_idx].pos[slot] = 0;
+
+            sprintf(buf, "MD%dh%c%c%c%c%2d",
+                    (state->card_idx + 1),
+                    state->hex[state->card[state->card_idx].pos[0]],
+                    state->hex[state->card[state->card_idx].pos[1]],
+                    state->hex[state->card[state->card_idx].pos[2]],
+                    state->hex[state->card[state->card_idx].pos[3]],
+                    (slot + 1)
+                    );
+            break;
+        /* default: */
+        /*     // because you should, and to protect from solar flares :) */
+        /*     state->card[state->card_idx].mode = 0; */
+        /*     _memory_device_face_draw(state, subsecond); */
     }
-
 
     // WIP temporarily deactivated blinking while not fully implemented
     // blink to indicate selected position
@@ -87,8 +106,11 @@ void memory_device_face_setup(movement_settings_t *settings, uint8_t watch_face_
         memory_device_state_t *state = (memory_device_state_t *)*context_ptr;
 
         // initialise default values
-        state->alphas = "abcdefGhijkLmnopqrstuwxHyz";
+        state->alphas = " abcdefGhijkLmnopqrstuwxHyz";
         state->nums = "0123456789";
+        state->hex = "0123456789abcdEf";
+        //                       ^ ^ ^
+        //                       are fucked
 
         for (uint8_t i = 0; i < CARDS; i++) {
             _memory_device_face_reset_card(state, i);
@@ -120,8 +142,15 @@ bool memory_device_face_loop(movement_event_t event, movement_settings_t *settin
         case EVENT_LIGHT_LONG_PRESS:  // led
             movement_illuminate_led();
             break;
-        case EVENT_LIGHT_LONG_UP:     // toggle mode
-            state->card[state->card_idx].mode = (!state->card[state->card_idx].mode);
+        case EVENT_LIGHT_LONG_UP:     // cycle modes
+            /* state->card[state->card_idx].mode = (!state->card[state->card_idx].mode); */
+            state->card[state->card_idx].mode++;
+            //REVIEW
+            //  this might not be necessary
+            //  make var or def for no of modes
+            /* if (state->card[state->card_idx].mode >= 3) state->card[state->card_idx].mode = 0; */
+            // NOTE don't use hex mode yet
+            if (state->card[state->card_idx].mode >= 2) state->card[state->card_idx].mode = 0;
             _memory_device_face_reset_card(state, state->card_idx);  // reset card when changing mode
             _memory_device_face_draw(state, event.subsecond);
             break;
