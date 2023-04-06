@@ -209,7 +209,9 @@ void timer_face_setup(movement_settings_t *settings, uint8_t watch_face_index, v
 void timer_face_activate(movement_settings_t *settings, void *context) {
     (void) settings;
     timer_state_t *state = (timer_state_t *)context;
-    watch_display_string("TR", 0);
+    /* watch_display_string("TR", 0); */
+    // REVIEW decide whether I like TR or CD more
+    watch_display_string("CD", 0);
     watch_set_colon();
     if(state->mode == running) {
         watch_date_time now = watch_rtc_get_date_time();
@@ -354,7 +356,7 @@ bool timer_face_loop(movement_event_t event, movement_settings_t *settings, void
         case EVENT_MODE_LONG_PRESS:
         case EVENT_TIMEOUT:
             _abort_quick_cycle(state);
-            movement_move_to_face(0);
+            if (!(state->mode == running)) movement_move_to_face(0);
             break;
         default:
             movement_default_loop_handler(event, settings);
