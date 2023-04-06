@@ -34,19 +34,24 @@
  *
  */
 
-#define START_MODE  1   // start in alpha mode or numeric mode (0 or 1 respectively)
+#define START_MODE  0   // start in numeric mode or alpha mode (0 or 1 respectively)
 #define CARDS  3        // no of available pages (max. 16)
 #define SLOTS  4        // no of available columns (max. 6) (not configurable at the moment)
 
+// TODO rename pos->slot & SLOTS -> TOTAL-SLOTS
 typedef struct {
     uint8_t pos[SLOTS];
+    uint8_t slot_idx : 3;
     bool mode : 1;
 } card_data_t;
 
 typedef struct {
-    uint8_t card_idx : 4;
-    uint8_t setting_pos : 3;
     card_data_t card[CARDS];
+    uint8_t card_idx : 4;
+    /* const char alphas = "abcdefGhijkLmnopqrstuwxHyz"; */
+    /* const char nums = "0123456789"; */
+    const char *alphas;
+    const char *nums;
 } memory_device_state_t;
 
 void memory_device_face_setup(movement_settings_t *settings, uint8_t watch_face_index, void ** context_ptr);
