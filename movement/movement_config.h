@@ -29,13 +29,10 @@
 
 const watch_face_t watch_faces[] = {
     simple_clock_face,
-    world_clock2_face,
     stock_stopwatch_face,
     timer_face,
+    alarm_face,
     counter_face,
-    sunrise_sunset_face,
-    moon_phase_face,
-    //tide clock
     thermistor_readout_face,
     ratemeter_face,
     pulsometer_face,
@@ -54,7 +51,10 @@ const watch_face_t watch_faces[] = {
         ships_bell_face,
 
     memory_device_face,
-    alarm_face,
+    world_clock2_face,
+    sunrise_sunset_face,
+    moon_phase_face,
+    //tide clock
     preferences_face,
     set_time_face,
     voltage_face,
@@ -74,6 +74,6 @@ const watch_face_t watch_faces[] = {
  * Usually it makes sense to set this to the preferences face.
  */
 /* #define MOVEMENT_SECONDARY_FACE_INDEX 0 // or (MOVEMENT_NUM_FACES - 2) */
-#define MOVEMENT_SECONDARY_FACE_INDEX (MOVEMENT_NUM_FACES - 11)
+#define MOVEMENT_SECONDARY_FACE_INDEX (MOVEMENT_NUM_FACES - 13)
 
 #endif // MOVEMENT_CONFIG_H_
