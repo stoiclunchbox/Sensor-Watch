@@ -41,8 +41,6 @@ const watch_face_t watch_faces[] = {
     tomato_face,
     probability_face,
     databank_face,
-    totp_face,
-        totp_face_lfs,
         rpn_calculator_face,
         rpn_calculator_alt_face,
         habit_face,
@@ -60,6 +58,8 @@ const watch_face_t watch_faces[] = {
     voltage_face,
     finetune_face,
     nanosec_face,
+    totp_face,
+    totp_face_lfs,
         character_set_face,
         chirpy_demo_face,
         thermistor_logging_face,
@@ -74,6 +74,6 @@ const watch_face_t watch_faces[] = {
  * Usually it makes sense to set this to the preferences face.
  */
 /* #define MOVEMENT_SECONDARY_FACE_INDEX 0 // or (MOVEMENT_NUM_FACES - 2) */
-#define MOVEMENT_SECONDARY_FACE_INDEX (MOVEMENT_NUM_FACES - 13)
+#define MOVEMENT_SECONDARY_FACE_INDEX (MOVEMENT_NUM_FACES - 15)
 
 #endif // MOVEMENT_CONFIG_H_
