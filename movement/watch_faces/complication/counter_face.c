@@ -33,19 +33,19 @@ void counter_face_setup(movement_settings_t *settings, uint8_t watch_face_index,
     if (*context_ptr == NULL) {
         *context_ptr = malloc(sizeof(counter_state_t));
         memset(*context_ptr, 0, sizeof(counter_state_t));
+        counter_state_t *state = (counter_state_t *)*context_ptr;
     }
-}
-
-void counter_face_activate(movement_settings_t *settings, void *context) {
-    counter_state_t *state = (counter_state_t *)context;
-
     if (!settings->bit.button_should_sound) state->counter_beeps = 0;
     else state->counter_beeps = 1;
 }
 
+void counter_face_activate(movement_settings_t *settings, void *context) {
+    (void) settings;
+    (void) context;
+}
+
 bool counter_face_loop(movement_event_t event, movement_settings_t *settings, void *context) {
     (void) settings;
-
     counter_state_t *state = (counter_state_t *)context;
 
     switch (event.event_type) {
@@ -72,7 +72,7 @@ bool counter_face_loop(movement_event_t event, movement_settings_t *settings, vo
             print_counter(state);
             break;
         case EVENT_TIMEOUT:
-            movement_move_to_face(0);
+            if (!state->counter_beeps) movement_move_to_face(0);
             break;
         default:
             movement_default_loop_handler(event, settings);
