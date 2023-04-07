@@ -169,6 +169,8 @@ bool memory_device_face_loop(movement_event_t event, movement_settings_t *settin
             _memory_device_face_draw(state, event.subsecond);
             break;
         case EVENT_TIMEOUT:
+            // we'll need to do this once we make a tick based animation
+            /* movement_request_tick_frequency(1); */
             movement_move_to_face(0);
             break;
         case EVENT_LOW_ENERGY_UPDATE:
