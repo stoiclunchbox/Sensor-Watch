@@ -315,7 +315,7 @@ bool timer_face_loop(movement_event_t event, movement_settings_t *settings, void
             break;
         case EVENT_BACKGROUND_TASK:
             // play the alarm
-            _beeps_to_play = 14;  // beep rounds - 1
+            _beeps_to_play = 9;  // desired beep rounds - 1
             watch_buzzer_play_sequence((int8_t *)_sound_seq_beep, _signal_callback);
             _reset(state);
             if (state->timers[state->current_timer].unit.repeat) _start(state, settings, false);
