@@ -28,13 +28,12 @@
 #include "watch.h"
 
 void counter_face_setup(movement_settings_t *settings, uint8_t watch_face_index, void ** context_ptr) {
-    (void) settings;
     (void) watch_face_index;
     if (*context_ptr == NULL) {
         *context_ptr = malloc(sizeof(counter_state_t));
         memset(*context_ptr, 0, sizeof(counter_state_t));
-        counter_state_t *state = (counter_state_t *)*context_ptr;
     }
+    counter_state_t *state = (counter_state_t *)*context_ptr;
     if (!settings->bit.button_should_sound) state->counter_beeps = 0;
     else state->counter_beeps = 1;
 }
