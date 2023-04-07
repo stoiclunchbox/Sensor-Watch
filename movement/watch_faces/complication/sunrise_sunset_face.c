@@ -292,6 +292,25 @@ void sunrise_sunset_face_setup(movement_settings_t *settings, uint8_t watch_face
     if (*context_ptr == NULL) {
         *context_ptr = malloc(sizeof(sunrise_sunset_state_t));
         memset(*context_ptr, 0, sizeof(sunrise_sunset_state_t));
+        sunrise_sunset_state_t *state = (sunrise_sunset_state_t *)*context_ptr;
+
+        //set default lat/lon write to register
+        state->working_latitude.sign        = 1;
+        state->working_latitude.hundreds    = 0;
+        state->working_latitude.tens        = 2;
+        state->working_latitude.ones        = 7;
+        state->working_latitude.tenths      = 3;
+        state->working_latitude.hundredths  = 9;
+
+        state->working_longitude.sign       = 0;
+        state->working_longitude.hundreds   = 1;
+        state->working_longitude.tens       = 5;
+        state->working_longitude.ones       = 3;
+        state->working_longitude.tenths     = 0;
+        state->working_longitude.hundredths = 6;
+
+        state->location_changed = true;
+        _sunrise_sunset_face_update_location_register(state);
     }
 }
 
