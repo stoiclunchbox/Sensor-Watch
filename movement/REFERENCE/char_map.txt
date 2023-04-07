@@ -1,0 +1,99 @@
+Pos 0   1   2   3   4   5   6   7   8   9  NOTES
+A  ✅  ✅  ❌  ✅  ❌  ✅  ❌  ✅  ✅  ✅  
+B  ⚠️   ⚠️   ❌  ⚠️   ⚠️   ⚠️   ⚠️   ⚠️   ⚠️   ⚠️   Looks like number 8. Can be made more B-like in positions 0 and 1
+C  ✅  ✅  ❌  ✅  ✅  ✅  ✅  ✅  ✅  ✅  
+D  ⚠️   ⚠️   ❌  ⚠️   ⚠️   ⚠️   ⚠️   ⚠️   ⚠️   ⚠️   Looks like number 0. Can be made more D-like in positions 0 and 1
+E  ✅  ✅  ❌  ✅  ✅  ✅  ✅  ✅  ✅  ✅  
+F  ✅  ✅  ❌  ✅  ❌  ✅  ❌  ✅  ✅  ✅  
+G  ✅  ❌  ❌  ✅  ✅  ✅  ✅  ✅  ✅  ✅  
+H  ✅  ✅  ❌  ✅  ✅  ✅  ✅  ✅  ✅  ✅  
+I  ✅  ❌  ❌  ❌  ❌  ❌  ❌  ❌  ❌  ❌  
+J  ✅  ✅  ❌  ✅  ❌  ✅  ❌  ✅  ✅  ✅  
+K  ✅  ❌  ❌  ✅  ❌  ✅  ❌  ✅  ✅  ✅  This one requires a little bit of imagination
+L  ✅  ✅  ❌  ✅  ❌  ✅  ❌  ✅  ✅  ✅  
+M  ✅  ❌  ❌  ❌  ❌  ❌  ❌  ❌  ❌  ❌  
+N  ✅  ✅  ❌  ✅  ❌  ✅  ❌  ✅  ✅  ✅  
+O  ✅  ✅  ❌  ✅  ✅  ✅  ✅  ✅  ✅  ✅  
+P  ✅  ❌  ❌  ✅  ❌  ✅  ❌  ✅  ✅  ✅  
+Q  ✅  ❌  ❌  ✅  ❌  ✅  ❌  ✅  ✅  ✅  
+R  ❌  ✅  ❌  ❌  ❌  ❌  ❌  ❌  ❌  ❌  
+S  ✅  ❌  ❌  ✅  ✅  ✅  ✅  ✅  ✅  ✅  
+T  ✅  ⚠️   ❌  ❌  ❌  ❌  ❌  ❌  ❌  ❌  For use in position 1, manually set segment (1, 12)
+U  ✅  ✅  ❌  ✅  ❌  ✅  ❌  ✅  ✅  ✅  U and V are identical
+V  ✅  ✅  ❌  ✅  ❌  ✅  ❌  ✅  ✅  ✅  U and V are identical
+W  ✅  ❌  ❌  ❌  ❌  ❌  ❌  ❌  ❌  ❌  
+X  ✅  ✅  ❌  ✅  ❌  ✅  ❌  ✅  ✅  ✅  This one requires a lot of imagination
+Y  ✅  ❌  ❌  ✅  ❌  ✅  ❌  ✅  ✅  ✅  
+Z  ✅  ❌  ❌  ✅  ✅  ✅  ✅  ✅  ✅  ✅  
+   
+a  ✅  ❌  ✅  ✅  ✅  ✅  ✅  ✅  ✅  ✅  
+b  ✅  ❌  ❌  ✅  ❌  ✅  ❌  ✅  ✅  ✅  
+c  ✅  ❌  ❌  ✅  ❌  ✅  ❌  ✅  ✅  ✅  
+d  ✅  ❌  ❌  ✅  ❌  ✅  ❌  ✅  ✅  ✅  
+e  ✅  ❌  ❌  ✅  ✅  ✅  ✅  ✅  ✅  ✅  
+f  ✅  ✅  ❌  ✅  ❌  ✅  ❌  ✅  ✅  ✅  
+g  ✅  ❌  ❌  ✅  ✅  ✅  ✅  ✅  ✅  ✅  
+h  ✅  ⚠️   ❌  ✅  ✅  ✅  ✅  ✅  ✅  ✅  By sheer coincidence, appears as uppercase H in position 1
+i  ✅  ❌  ✅  ✅  ✅  ✅  ✅  ✅  ✅  ✅  
+j  ✅  ❌  ❌  ✅  ✅  ✅  ✅  ✅  ✅  ✅  Lowercase j appears as superscript to work in more positions
+k  ✅  ❌  ❌  ✅  ❌  ✅  ❌  ✅  ✅  ✅  This one requires a little bit of imagination
+l  ✅  ✅  ❌  ✅  ✅  ✅  ✅  ✅  ✅  ✅  
+m  ✅  ❌  ❌  ❌  ❌  ❌  ❌  ❌  ❌  ❌  
+n  ✅  ❌  ❌  ✅  ✅  ✅  ✅  ✅  ✅  ✅  
+o  ✅  ❌  ❌  ✅  ❌  ✅  ❌  ✅  ✅  ✅  
+p  ✅  ❌  ❌  ✅  ❌  ✅  ❌  ✅  ✅  ✅  
+q  ✅  ❌  ❌  ✅  ❌  ✅  ❌  ✅  ✅  ✅  
+r  ✅  ❌  ❌  ✅  ✅  ✅  ✅  ✅  ✅  ✅  
+s  ✅  ❌  ❌  ✅  ✅  ✅  ✅  ✅  ✅  ✅  
+t  ✅  ✅  ❌  ✅  ❌  ✅  ❌  ✅  ✅  ✅  
+u  ✅  ❌  ❌  ✅  ✅  ✅  ✅  ✅  ✅  ✅  Lowercase u appears as superscript to work in more positions
+v  ✅  ❌  ❌  ✅  ✅  ✅  ✅  ✅  ✅  ✅  Lowercase v appears as superscript to work in more positions
+w  ✅  ❌  ❌  ❌  ❌  ❌  ❌  ❌  ❌  ❌  
+x  ✅  ✅  ❌  ✅  ❌  ✅  ❌  ✅  ✅  ✅  This one requires a lot of imagination
+y  ✅  ❌  ❌  ✅  ❌  ✅  ❌  ✅  ✅  ✅  
+z  ✅  ❌  ❌  ✅  ✅  ✅  ✅  ✅  ✅  ✅  
+   
+0  ✅  ✅  ❌  ✅  ✅  ✅  ✅  ✅  ✅  ✅  
+1  ✅  ✅  ✅  ✅  ✅  ✅  ✅  ✅  ✅  ✅  
+2  ✅  ❌  ✅  ✅  ✅  ✅  ✅  ✅  ✅  ✅  
+3  ✅  ✅  ✅  ✅  ✅  ✅  ✅  ✅  ✅  ✅  
+4  ✅  ❌  ❌  ✅  ✅  ✅  ✅  ✅  ✅  ✅  
+5  ✅  ❌  ❌  ✅  ✅  ✅  ✅  ✅  ✅  ✅  
+6  ✅  ❌  ❌  ✅  ✅  ✅  ✅  ✅  ✅  ✅  
+7  ✅  ✅  ❌  ✅  ⚠️   ✅  ⚠️   ✅  ✅  ✅  String display method will swap in the “lowercase” 7 in positions 4 and 6
+8  ✅  ✅  ❌  ✅  ✅  ✅  ✅  ✅  ✅  ✅  
+9  ✅  ❌  ❌  ✅  ✅  ✅  ✅  ✅  ✅  ✅  
+   
+'  ✅  ✅  ✅  ✅  ✅  ✅  ✅  ✅  ✅  ✅  Clears any segments in the given position
+@  ✅  ✅  ✅  ✅  ✅  ✅  ✅  ✅  ✅  ✅  This character turns on all segments
+   
+[  ✅  ✅  ❌  ✅  ✅  ✅  ✅  ✅  ✅  ✅  Looks like the letter C, as well as ( and {
+]  ✅  ✅  ❌  ✅  ✅  ✅  ✅  ✅  ✅  ✅  Looks like ) and }
+^  ✅  ❌  ❌  ✅  ❌  ✅  ❌  ✅  ✅  ✅  
+_  ✅  ✅  ❌  ✅  ❌  ✅  ❌  ✅  ✅  ✅  
+`  ✅  ❌  ✅  ✅  ✅  ✅  ✅  ✅  ✅  ✅  
+{  ✅  ✅  ❌  ✅  ✅  ✅  ✅  ✅  ✅  ✅  Looks like the letter C, as well as ( and [
+}  ✅  ✅  ❌  ✅  ✅  ✅  ✅  ✅  ✅  ✅  Looks like ) and ]
+|  ✅  ✅  ❌  ✅  ✅  ✅  ✅  ✅  ✅  ✅  
+~  ✅  ✅  ❌  ✅  ❌  ✅  ❌  ✅  ✅  ✅  Top segment only
+"  ✅  ❌  ❌  ✅  ✅  ✅  ✅  ✅  ✅  ✅  
+#  ✅  ❌  ❌  ✅  ❌  ✅  ❌  ✅  ✅  ✅  This is actually the degree º or numero ° symbol
+&  ✅  ❌  ❌  ✅  ✅  ✅  ✅  ✅  ✅  ✅  This is a “lowercase” 7 for use in positions 4 and 6
+'  ✅  ❌  ❌  ✅  ✅  ✅  ✅  ✅  ✅  ✅  
+(  ✅  ✅  ❌  ✅  ✅  ✅  ✅  ✅  ✅  ✅  Looks like the letter C, as well as [ and {
+)  ✅  ✅  ❌  ✅  ✅  ✅  ✅  ✅  ✅  ✅  Looks like ] and }
++  ✅  ❌  ❌  ❌  ❌  ❌  ❌  ❌  ❌  ❌  
+,  ✅  ❌  ✅  ✅  ✅  ✅  ✅  ✅  ✅  ✅  
+-  ✅  ✅  ❌  ✅  ✅  ✅  ✅  ✅  ✅  ✅  
+.  ✅  ✅  ❌  ✅  ✅  ✅  ✅  ✅  ✅  ✅  Period appears as hyphen since there are no dots
+/  ✅  ❌  ✅  ✅  ✅  ✅  ✅  ✅  ✅  ✅  
+<  ✅  ❌  ❌  ✅  ❌  ✅  ❌  ✅  ✅  ✅  Looks like lowercase c
+=  ✅  ✅  ❌  ✅  ❌  ✅  ❌  ✅  ✅  ✅  
+>  ✅  ❌  ❌  ✅  ❌  ✅  ❌  ✅  ✅  ✅  
+?  ✅  ❌  ❌  ✅  ❌  ✅  ❌  ✅  ✅  ✅  
+:  –   –   –   –   –   –   –   –   –   –   A colon is available between positions 5 and 6
+;  –   –   –   –   –   –   –   –   –   –   
+!  –   –   –   –   –   –   –   –   –   –   Unused; currently blank
+*  –   –   –   –   –   –   –   –   –   –   Unused; currently blank
+$  –   –   –   –   –   –   –   –   –   –   Unused; currently blank
+%  –   –   –   –   –   –   –   –   –   –   Unused; currently blank
