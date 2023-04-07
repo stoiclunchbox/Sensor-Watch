@@ -70,16 +70,16 @@ static EM_BOOL watch_invoke_key_callback(int eventType, const EmscriptenKeyboard
 
     uint8_t button_id;
     switch (key[0]) {
+        case 'G':
+        case 'g':
+            button_id = BTN_ID_ALARM;
+            break;
         case 'R':
         case 'r':
-            button_id = BTN_ID_ALARM;
+            button_id = BTN_ID_LIGHT;
             break;
         case 'F':
         case 'f':
-            button_id = BTN_ID_LIGHT;
-            break;
-        case 'G':
-        case 'g':
             button_id = BTN_ID_MODE;
             break;
         default:
