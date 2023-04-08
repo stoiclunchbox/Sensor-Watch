@@ -69,32 +69,37 @@ static void _memory_device_face_draw(memory_device_state_t *state, uint8_t subse
                     (slot + 1)
                     );
             break;
-        case 2:  // alphanum  REVIEW
-            if (state->card[state->card_idx].pos[slot] >= 36)
-                state->card[state->card_idx].pos[slot] = 0;
+        /* case 2:  // alphanum  REVIEW */
+        /*     if (state->card[state->card_idx].pos[slot] >= 36) */
+        /*         state->card[state->card_idx].pos[slot] = 0; */
 
-            sprintf(buf, "MD%dh%c%c%c%c%2d",
-                    (state->card_idx + 1),
-                    state->alphanums[state->card[state->card_idx].pos[0]],
-                    state->alphanums[state->card[state->card_idx].pos[1]],
-                    state->alphanums[state->card[state->card_idx].pos[2]],
-                    state->alphanums[state->card[state->card_idx].pos[3]],
-                    (slot + 1)
-                    );
-            break;
-        case 3:  // hex
-            if (state->card[state->card_idx].pos[slot] >= 16)
-                state->card[state->card_idx].pos[slot] = 0;
+        /*     sprintf(buf, "MD%dh%c%c%c%c%2d", */
+        /*             (state->card_idx + 1), */
+        /*             state->alphanums[state->card[state->card_idx].pos[0]], */
+        /*             state->alphanums[state->card[state->card_idx].pos[1]], */
+        /*             state->alphanums[state->card[state->card_idx].pos[2]], */
+        /*             state->alphanums[state->card[state->card_idx].pos[3]], */
+        /*             (slot + 1) */
+        /*             ); */
+        /*     break; */
+        // WIP hex mode (chars don't look good in some positions)
+        //      do I even need this?
+        //          just use alphanum?
+        //          REVIEW do I even need modes?? fuck
+        /* case 3:  // hex */
+        /*     if (state->card[state->card_idx].pos[slot] >= 16) */
+        /*         state->card[state->card_idx].pos[slot] = 0; */
 
-            sprintf(buf, "MD%dh%c%c%c%c%2d",
-                    (state->card_idx + 1),
-                    state->hex[state->card[state->card_idx].pos[0]],
-                    state->hex[state->card[state->card_idx].pos[1]],
-                    state->hex[state->card[state->card_idx].pos[2]],
-                    state->hex[state->card[state->card_idx].pos[3]],
-                    (slot + 1)
-                    );
-            break;
+        /*     sprintf(buf, "MD%dh%c%c%c%c%2d", */
+        /*             (state->card_idx + 1), */
+        /*             state->hex[state->card[state->card_idx].pos[0]], */
+        /*             state->hex[state->card[state->card_idx].pos[1]], */
+        /*             state->hex[state->card[state->card_idx].pos[2]], */
+        /*             state->hex[state->card[state->card_idx].pos[3]], */
+        /*             (slot + 1) */
+        /*             ); */
+        /*     break; */
+
         /* default: */
         /*     // because you should, and to protect from solar flares :) */
         /*     state->card[state->card_idx].mode = 0; */
