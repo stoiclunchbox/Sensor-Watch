@@ -43,7 +43,7 @@ static void _memory_device_face_draw(memory_device_state_t *state, uint8_t subse
     uint8_t slot = state->card[state->card_idx].slot_idx;
 
     switch (mode) {
-        case 0:
+        case 0:  // alpha
             if (state->card[state->card_idx].pos[slot] >= 27)
                 state->card[state->card_idx].pos[slot] = 0;
 
@@ -56,7 +56,7 @@ static void _memory_device_face_draw(memory_device_state_t *state, uint8_t subse
                     state->alphas[state->card[state->card_idx].pos[3]]
                     );
             break;
-        case 1:
+        case 1:  // num
             if (state->card[state->card_idx].pos[slot] >= 10)
                 state->card[state->card_idx].pos[slot] = 0;
 
@@ -69,7 +69,20 @@ static void _memory_device_face_draw(memory_device_state_t *state, uint8_t subse
                     (slot + 1)
                     );
             break;
-        case 2:
+        case 2:  // alphanum  REVIEW
+            if (state->card[state->card_idx].pos[slot] >= 36)
+                state->card[state->card_idx].pos[slot] = 0;
+
+            sprintf(buf, "MD%dh%c%c%c%c%2d",
+                    (state->card_idx + 1),
+                    state->alphanums[state->card[state->card_idx].pos[0]],
+                    state->alphanums[state->card[state->card_idx].pos[1]],
+                    state->alphanums[state->card[state->card_idx].pos[2]],
+                    state->alphanums[state->card[state->card_idx].pos[3]],
+                    (slot + 1)
+                    );
+            break;
+        case 3:  // hex
             if (state->card[state->card_idx].pos[slot] >= 16)
                 state->card[state->card_idx].pos[slot] = 0;
 
