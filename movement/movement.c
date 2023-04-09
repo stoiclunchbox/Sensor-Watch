@@ -87,8 +87,9 @@ watch_date_time scheduled_tasks[MOVEMENT_NUM_FACES];
 // REVIEW new values
 const int32_t movement_le_inactivity_deadlines[8] = {INT_MAX, 3600, 7200, 10800, 21600, 43200, 86400, 259200};
 const int16_t movement_timeout_inactivity_deadlines[4] = {60, 120, 300, 1800};
+/* const float   movement_led_time_ticks[4] = {0, 96, 192, 1536};  // off, .75, 1.5 & 12 */
 // REVIEW
-const float   movement_led_time_ticks[4] = {0, 96, 192, 1536};  // off, .75, 1.5 & 12
+const uint8_t movement_led_time_ticks[4] = {96, 192, 512, 1920};  // .75, 1.5, 4 & 15
 movement_event_t event;
 
 const int16_t movement_timezone_offsets[] = {
@@ -229,7 +230,7 @@ void movement_illuminate_led(void) {
                             movement_state.settings.bit.led_green_color ? (0xF | movement_state.settings.bit.led_green_color << 4) : 0);
         /* movement_state.light_ticks = (movement_state.settings.bit.led_duration * 2 - 1) * 128;      // original */
         // REVIEW
-        movement_state.light_ticks = movement_led_time_ticks[movement_state.settings.bit.led_duration];
+        movement_state.light_ticks = movement_led_time_ticks[movement_state.settings.bit.led_duration];  // formula: ticks / 128 = seconds_duration
 
         _movement_enable_fast_tick_if_needed();
     }

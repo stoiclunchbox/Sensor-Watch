@@ -178,16 +178,16 @@ bool preferences_face_loop(movement_event_t event, movement_settings_t *settings
                 // REVIEW
                 switch (settings->bit.led_duration) {
                     case 0:
-                        watch_display_string("no SeC", 4);
-                        break;
-                    case 1:
                         watch_display_string(".75SeC", 4);
                         break;
-                    case 2:
+                    case 1:
                         watch_display_string("1.5SeC", 4);
                         break;
+                    case 2:
+                        watch_display_string("4  SeC", 4);
+                        break;
                     case 3:
-                        watch_display_string("12 SeC", 4);
+                        watch_display_string("15 SeC", 4);
                         break;
                 }
                 break;
