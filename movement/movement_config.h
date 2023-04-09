@@ -60,6 +60,7 @@ const watch_face_t watch_faces[] = {
     sunrise_sunset_face,
     moon_phase_face,
     //tide clock
+    recycle_bin_face,
     preferences_face,
     set_time_face,
     voltage_face,
@@ -81,6 +82,6 @@ const watch_face_t watch_faces[] = {
  * Usually it makes sense to set this to the preferences face.
  */
 /* #define MOVEMENT_SECONDARY_FACE_INDEX 0 // or (MOVEMENT_NUM_FACES - 2) */
-#define MOVEMENT_SECONDARY_FACE_INDEX (MOVEMENT_NUM_FACES - 15)
+#define MOVEMENT_SECONDARY_FACE_INDEX (MOVEMENT_NUM_FACES - 16)
 
 #endif // MOVEMENT_CONFIG_H_
