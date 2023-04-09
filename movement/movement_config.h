@@ -33,19 +33,26 @@ const watch_face_t watch_faces[] = {
     timer_face,
     alarm_face,
     counter_face,
+        //HELPERS
+        //water
+        //recycle bin
+        //due
     thermistor_readout_face,
     ratemeter_face,
     pulsometer_face,
     tachymeter_face,
-    day_one_face,
+    //telemeter
+        //TIME PASSAGE
+        day_one_face,
+        time_left_face,
+        //actual time left?
     tomato_face,
+        interval_face,
     probability_face,
     databank_face,
         rpn_calculator_face,
         rpn_calculator_alt_face,
         habit_face,
-        time_left_face,
-        interval_face,
         ships_bell_face,
 
     memory_device_face,
@@ -58,11 +65,11 @@ const watch_face_t watch_faces[] = {
     voltage_face,
     finetune_face,
     nanosec_face,
+        thermistor_logging_face,
     totp_face,
     totp_face_lfs,
         character_set_face,
         chirpy_demo_face,
-        thermistor_logging_face,
         tempchart_face,
 };
 
