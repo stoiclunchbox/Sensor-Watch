@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) <#year#> <#author_name#>
+ * Copyright (c) <#year#> <#author_name#>  TODO
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,12 +30,20 @@
 /*
  * A DESCRIPTION OF YOUR WATCH FACE
  *
- * and a description of how use it
+ * and a description of how use it  TODO
  *
  */
 
+// TODO cleanup this struct
+//          we shouldn't need all this, it was probably only
+//          necessary because I was doing things I shouldn't.
 typedef struct {
     watch_date_time datetime_start;
+    watch_date_time datetime_now;
+    uint32_t int_start;
+    uint32_t int_now;
+    uint32_t int_difference;
+    bool bin_week;
 } recycle_bin_state_t;
 
 void recycle_bin_face_setup(movement_settings_t *settings, uint8_t watch_face_index, void ** context_ptr);

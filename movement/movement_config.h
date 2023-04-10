@@ -29,14 +29,12 @@
 
 const watch_face_t watch_faces[] = {
     simple_clock_face,
+    //INTERNAL
     stock_stopwatch_face,
     timer_face,
     alarm_face,
     counter_face,
-        //HELPERS
-        //water
-        //recycle bin
-        //due
+    //water
     thermistor_readout_face,
     ratemeter_face,
     pulsometer_face,
@@ -52,14 +50,16 @@ const watch_face_t watch_faces[] = {
     databank_face,
         rpn_calculator_face,
         rpn_calculator_alt_face,
-        habit_face,
+        habit_face, //work out if I want to keep / use
         ships_bell_face,
 
     memory_device_face,
+    //EXTERNAL
     world_clock2_face,
     sunrise_sunset_face,
     moon_phase_face,
     //tide clock
+    //due (rubbish bin)
     recycle_bin_face,
     preferences_face,
     set_time_face,

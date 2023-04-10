@@ -24,6 +24,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include "watch_utility.h"
 #include "recycle_bin_face.h"
 
 void recycle_bin_face_setup(movement_settings_t *settings, uint8_t watch_face_index, void ** context_ptr) {
@@ -36,40 +37,45 @@ void recycle_bin_face_setup(movement_settings_t *settings, uint8_t watch_face_in
         // initialise to zero
         state->datetime_start.reg = 0;
 
+        // TODO refine these instructions
         // Set to the day after a green bin day
         //  (ie the first day of a seven day period where you SHOULD
         //  put out the recycling bin)
-        // BUG off by a day, says yes from 13-19 apr 23 (inclusive)
+        //  ..which includes the bin day itself, incase you check it that
+        //  morning
         state->datetime_start.unit.year  = 23;
         state->datetime_start.unit.month = 3;
-        state->datetime_start.unit.day   = 31;
+        state->datetime_start.unit.day   = 17;
     }
 }
 
 void recycle_bin_face_activate(movement_settings_t *settings, void *context) {
     (void) settings;
-    (void) context;
+    recycle_bin_state_t *state = (recycle_bin_state_t *)context;
+
+    state->datetime_now = watch_rtc_get_date_time();
+        // NOTE This works, but..
+        // TODO find out what we should be doing.
+        // REVIEW correctly apply WATCH_RTC_REFERENCE_YEAR offset
+        /* state->datetime_now.unit.year += WATCH_RTC_REFERENCE_YEAR; */
+        state->datetime_now.unit.year += 20;
+    state->datetime_now.unit.hour   = 0;
+    state->datetime_now.unit.minute = 0;
+    state->datetime_now.unit.second = 0;
+    state->int_start = watch_utility_date_time_to_unix_time(state->datetime_start, 0);
+    state->int_now = watch_utility_date_time_to_unix_time(state->datetime_now, 0);
 }
 
 bool recycle_bin_face_loop(movement_event_t event, movement_settings_t *settings, void *context) {
     recycle_bin_state_t *state = (recycle_bin_state_t *)context;
-    char buf[14];
-
-    watch_date_time datetime_now = watch_rtc_get_date_time();
-    datetime_now.unit.year += WATCH_RTC_REFERENCE_YEAR;
-    watch_date_time difference;
-    bool bin_week = 0;
+    char buf[12];
 
     switch (event.event_type) {
         case EVENT_ACTIVATE:
-            difference.reg = (datetime_now.reg - state->datetime_start.reg);
-            bin_week = (!((difference.unit.day / 7) % 2));
-            sprintf(buf, "RC   thu %c", bin_week ? 'y' : 'n');
+            state->int_difference = ((state->int_now - state->int_start) / 86400);
+            state->bin_week = (!((state->int_difference / 7) % 2));
+            sprintf(buf, "RC   thu %c", state->bin_week ? 'y' : 'n');
             watch_display_string(buf, 0);
-            break;
-        case EVENT_LIGHT_BUTTON_UP:
-            break;
-        case EVENT_ALARM_BUTTON_UP:
             break;
         case EVENT_TIMEOUT:
             movement_move_to_face(0);

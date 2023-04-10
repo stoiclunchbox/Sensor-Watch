@@ -294,7 +294,7 @@ void sunrise_sunset_face_setup(movement_settings_t *settings, uint8_t watch_face
         memset(*context_ptr, 0, sizeof(sunrise_sunset_state_t));
         sunrise_sunset_state_t *state = (sunrise_sunset_state_t *)*context_ptr;
 
-        //set default lat/lon write to register
+        //set default lat/lon & write to register
         state->working_latitude.sign        = 1;
         state->working_latitude.hundreds    = 0;
         state->working_latitude.tens        = 2;

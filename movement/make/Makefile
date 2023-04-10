@@ -49,6 +49,8 @@ SRCS += \
   ../../littlefs/lfs_util.c \
   ../movement.c \
   ../filesystem.c \
+  ../watch_faces/complication/memory_device_face.c \
+  ../watch_faces/complication/recycle_bin_face.c \
   ../watch_faces/clock/simple_clock_face.c \
   ../watch_faces/clock/world_clock_face.c \
   ../watch_faces/clock/beats_face.c \
@@ -64,7 +66,6 @@ SRCS += \
   ../watch_faces/demo/lis2dw_logging_face.c \
   ../watch_faces/demo/demo_face.c \
   ../watch_faces/demo/hello_there_face.c \
-  ../watch_faces/complication/memory_device_face.c \
   ../watch_faces/complication/pulsometer_face.c \
   ../watch_faces/complication/day_one_face.c \
   ../watch_faces/complication/stopwatch_face.c \
@@ -108,7 +109,6 @@ SRCS += \
   ../watch_faces/complication/invaders_face.c \
   ../watch_faces/clock/world_clock2_face.c \
   ../watch_faces/complication/time_left_face.c \
-  ../watch_faces/complication/recycle_bin_face.c \
 # New watch faces go above this line.
 
 # Leave this line at the bottom of the file; it has all the targets for making your project.
