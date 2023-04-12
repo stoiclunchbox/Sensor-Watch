@@ -299,15 +299,15 @@ void sunrise_sunset_face_setup(movement_settings_t *settings, uint8_t watch_face
         state->working_latitude.hundreds    = 0;
         state->working_latitude.tens        = 2;
         state->working_latitude.ones        = 7;
-        state->working_latitude.tenths      = 3;
-        state->working_latitude.hundredths  = 9;
+        state->working_latitude.tenths      = 4;
+        state->working_latitude.hundredths  = 0;
 
         state->working_longitude.sign       = 0;
         state->working_longitude.hundreds   = 1;
         state->working_longitude.tens       = 5;
         state->working_longitude.ones       = 3;
         state->working_longitude.tenths     = 0;
-        state->working_longitude.hundredths = 6;
+        state->working_longitude.hundredths = 9;
 
         state->location_changed = true;
         _sunrise_sunset_face_update_location_register(state);
