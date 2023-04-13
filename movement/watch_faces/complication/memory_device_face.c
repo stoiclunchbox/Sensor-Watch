@@ -27,84 +27,32 @@
 #include "memory_device_face.h"
 
 
-
 static void _memory_device_face_reset_card(memory_device_state_t *state, uint8_t _card) {
-    for (uint8_t i = 0; i < SLOTS; i++) {
+    for (uint8_t i = 0; i < 6; i++) {
         state->card[_card].pos[i] = 0;
     }
     state->card[_card].slot_idx = 0;
 }
 
 static void _memory_device_face_draw(memory_device_state_t *state, uint8_t subsecond) {
-    char buf[12];
+    char buf[17];
 
-    //sanity vars for our mental convenience
-    uint8_t mode = state->card[state->card_idx].mode;
     uint8_t slot = state->card[state->card_idx].slot_idx;
-
-    switch (mode) {
-        case 0:  // alpha
-            if (state->card[state->card_idx].pos[slot] >= 27)
-                state->card[state->card_idx].pos[slot] = 0;
-
-            sprintf(buf, "MD%da%d%c %c%c%c",
-                    (state->card_idx + 1),
-                    (slot + 1),
-                    state->alphas[state->card[state->card_idx].pos[0]],
-                    state->alphas[state->card[state->card_idx].pos[1]],
-                    state->alphas[state->card[state->card_idx].pos[2]],
-                    state->alphas[state->card[state->card_idx].pos[3]]
-                    );
-            break;
-        case 1:  // num
-            if (state->card[state->card_idx].pos[slot] >= 10)
-                state->card[state->card_idx].pos[slot] = 0;
-
-            sprintf(buf, "MD%dn%c%c%c%c%2d",
-                    (state->card_idx + 1),
-                    state->nums[state->card[state->card_idx].pos[0]],
-                    state->nums[state->card[state->card_idx].pos[1]],
-                    state->nums[state->card[state->card_idx].pos[2]],
-                    state->nums[state->card[state->card_idx].pos[3]],
-                    (slot + 1)
-                    );
-            break;
-        /* case 2:  // alphanum  REVIEW */
-        /*     if (state->card[state->card_idx].pos[slot] >= 36) */
-        /*         state->card[state->card_idx].pos[slot] = 0; */
-
-        /*     sprintf(buf, "MD%dh%c%c%c%c%2d", */
-        /*             (state->card_idx + 1), */
-        /*             state->alphanums[state->card[state->card_idx].pos[0]], */
-        /*             state->alphanums[state->card[state->card_idx].pos[1]], */
-        /*             state->alphanums[state->card[state->card_idx].pos[2]], */
-        /*             state->alphanums[state->card[state->card_idx].pos[3]], */
-        /*             (slot + 1) */
-        /*             ); */
-        /*     break; */
-        // WIP hex mode (chars don't look good in some positions)
-        //      do I even need this?
-        //          just use alphanum?
-        //          REVIEW do I even need modes?? fuck
-        /* case 3:  // hex */
-        /*     if (state->card[state->card_idx].pos[slot] >= 16) */
-        /*         state->card[state->card_idx].pos[slot] = 0; */
-
-        /*     sprintf(buf, "MD%dh%c%c%c%c%2d", */
-        /*             (state->card_idx + 1), */
-        /*             state->hex[state->card[state->card_idx].pos[0]], */
-        /*             state->hex[state->card[state->card_idx].pos[1]], */
-        /*             state->hex[state->card[state->card_idx].pos[2]], */
-        /*             state->hex[state->card[state->card_idx].pos[3]], */
-        /*             (slot + 1) */
-        /*             ); */
-        /*     break; */
-
-        /* default: */
-        /*     // because you should, and to protect from solar flares :) */
-        /*     state->card[state->card_idx].mode = 0; */
-        /*     _memory_device_face_draw(state, subsecond); */
+    if (slot == 0 || slot == 2) {
+        if (state->card[state->card_idx].pos[slot] >= 11) state->card[state->card_idx].pos[slot] = 0;
+    } else {
+        if (state->card[state->card_idx].pos[slot] >= 37) state->card[state->card_idx].pos[slot] = 0;
     }
+
+    sprintf(buf, "MD%2d%c%c%c%c%c%c",
+            (state->card_idx + 1),
+            state->nums[state->card[state->card_idx].pos[0]],
+            state->alphanums[state->card[state->card_idx].pos[1]],
+            state->nums[state->card[state->card_idx].pos[2]],
+            state->alphanums[state->card[state->card_idx].pos[3]],
+            state->alphanums[state->card[state->card_idx].pos[4]],
+            state->alphanums[state->card[state->card_idx].pos[5]]
+            );
 
     // WIP temporarily deactivated blinking while not fully implemented
     // blink to indicate selected position
@@ -124,15 +72,14 @@ void memory_device_face_setup(movement_settings_t *settings, uint8_t watch_face_
         memory_device_state_t *state = (memory_device_state_t *)*context_ptr;
 
         // initialise default values
-        state->alphas = " abcdefGhijkLmnopqrstuwxHyz";
-        state->nums = "0123456789";
-        state->hex = "0123456789abcdEf";
-        //                       ^ ^ ^
-        //                       are fucked
+        state->alphanums = " 0123456789abcdefGhijkLmnopqrstuwxHyz";
+        state->nums = " 0123456789";
+        // TODO implement underscores after implementing blinking?
+        /* state->alphanums = "_0123456789abcdefGhijkLmnopqrstuwxHyz"; */
+        /* state->nums = "_0123456789"; */
 
         for (uint8_t i = 0; i < CARDS; i++) {
             _memory_device_face_reset_card(state, i);
-            state->card[i].mode = START_MODE;
         }
         state->card_idx = 0;
     }
@@ -155,44 +102,31 @@ bool memory_device_face_loop(movement_event_t event, movement_settings_t *settin
         case EVENT_ACTIVATE:
             _memory_device_face_draw(state, event.subsecond);
             break;
-        case EVENT_LIGHT_BUTTON_DOWN: // don't illuminate led immediately
-            break;
-        case EVENT_LIGHT_LONG_PRESS:  // led
-            movement_illuminate_led();
-            break;
-        case EVENT_LIGHT_LONG_UP:     // cycle modes
-            /* state->card[state->card_idx].mode = (!state->card[state->card_idx].mode); */
-            state->card[state->card_idx].mode++;
-            //REVIEW
-            //  this might not be necessary
-            //  make var or def for no of modes
-            /* if (state->card[state->card_idx].mode >= 3) state->card[state->card_idx].mode = 0; */
-            // NOTE don't use hex mode yet
-            if (state->card[state->card_idx].mode >= 2) state->card[state->card_idx].mode = 0;
-            _memory_device_face_reset_card(state, state->card_idx);  // reset card when changing mode
-            _memory_device_face_draw(state, event.subsecond);
-            break;
         case EVENT_LIGHT_BUTTON_UP:   // cycle cards
             state->card_idx++;
             if (state->card_idx >= CARDS) state->card_idx = 0;
             _memory_device_face_draw(state, event.subsecond);
             break;
-        case EVENT_ALARM_LONG_PRESS:  // cycle position
-            state->card[state->card_idx].slot_idx++;
-            if (state->card[state->card_idx].slot_idx >= SLOTS) state->card[state->card_idx].slot_idx = 0;
+        case EVENT_LIGHT_LONG_UP:     // reset card
+            _memory_device_face_reset_card(state, state->card_idx);
             _memory_device_face_draw(state, event.subsecond);
             break;
         case EVENT_ALARM_BUTTON_UP:   // cycle chars
             state->card[state->card_idx].pos[state->card[state->card_idx].slot_idx]++;
             _memory_device_face_draw(state, event.subsecond);
             break;
+        case EVENT_ALARM_LONG_PRESS:  // cycle position
+            state->card[state->card_idx].slot_idx++;
+            if (state->card[state->card_idx].slot_idx >= 6) state->card[state->card_idx].slot_idx = 0;
+            _memory_device_face_draw(state, event.subsecond);
+            break;
         case EVENT_TIMEOUT:
-            // we'll need to do this once we make a tick based animation
+            // TODO implement once we make a tick based animation
             /* movement_request_tick_frequency(1); */
             movement_move_to_face(0);
             break;
         case EVENT_LOW_ENERGY_UPDATE:
-            // not used (at the moment) because we timeout
+            // not used because we timeout
             break;
         default:
             // Movement's default loop handler will step in for any cases you don't handle above:
