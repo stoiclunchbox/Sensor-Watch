@@ -43,13 +43,6 @@ static inline int32_t _get_tz_offset(movement_settings_t *settings) {
     return movement_timezone_offsets[settings->bit.time_zone] * 60;
 }
 
-static void _signal_callback() {
-    if (_beeps_to_play) {
-        _beeps_to_play--;
-        watch_buzzer_play_sequence((int8_t *)_sound_seq_beep, _signal_callback);
-    }
-}
-
 static void _start(timer_state_t *state, movement_settings_t *settings, bool with_beep) {
     if (state->timers[state->current_timer].value == 0) return;
     watch_date_time now = watch_rtc_get_date_time();
@@ -57,10 +50,12 @@ static void _start(timer_state_t *state, movement_settings_t *settings, bool wit
     if (state->mode == pausing)
         state->target_ts = state->now_ts + state->paused_left;
     else
+        // BUG overflow is probably somewhere in here
         state->target_ts = watch_utility_offset_timestamp(state->now_ts, 
                                                           state->timers[state->current_timer].unit.hours, 
                                                           state->timers[state->current_timer].unit.minutes, 
                                                           state->timers[state->current_timer].unit.seconds);
+    // BUG or in this line
     watch_date_time target_dt = watch_utility_date_time_from_unix_time(state->target_ts, _get_tz_offset(settings));
     state->mode = running;
     movement_schedule_background_task(target_dt);
@@ -315,8 +310,17 @@ bool timer_face_loop(movement_event_t event, movement_settings_t *settings, void
             break;
         case EVENT_BACKGROUND_TASK:
             // play the alarm
-            _beeps_to_play = 9;  // desired beep rounds - 1
-            watch_buzzer_play_sequence((int8_t *)_sound_seq_beep, _signal_callback);
+            // TODO make countdown alarm unique (and still cancelable)
+            //          find a way to make watch_buzzer_play_sequence() use
+            //          a variable length/number of repetitions?
+            /* _beeps_to_play = 10; */
+            /* watch_buzzer_play_sequence((int8_t *)_sound_seq_beep, NULL); */
+            _beeps_to_play = 30;
+            movement_play_alarm_beeps(_beeps_to_play, BUZZER_NOTE_C8);
+            // BUG when face not active, overflow occurs when restarting lapped timers
+            //          but only when face not active
+            //     lapped timers are only started from here, hmm
+            //          has something to do with needing/not having foreground I suspect
             _reset(state);
             if (state->timers[state->current_timer].unit.repeat) _start(state, settings, false);
             break;
