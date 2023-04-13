@@ -27,7 +27,7 @@
 #include "tomato_face.h"
 #include "watch_utility.h"
 
-static uint8_t focus_min = 25;
+static uint8_t focus_min = 10;
 static uint8_t break_min = 5;
 
 static inline int32_t get_tz_offset(movement_settings_t *settings) {
