@@ -38,9 +38,9 @@ static void _day_one_face_update(day_one_state_t state) {
     uint32_t julian_date = _day_one_face_juliandaynum(date_time.unit.year + WATCH_RTC_REFERENCE_YEAR, date_time.unit.month, date_time.unit.day);
     uint32_t julian_birthdate = _day_one_face_juliandaynum(state.birth_year, state.birth_month, state.birth_day);
     if (julian_date < julian_birthdate) {
-        sprintf(buf, "DO  %6lu", julian_birthdate - julian_date);
+        sprintf(buf, "DO -%6lu", julian_birthdate - julian_date);  // counting down
     } else {
-        sprintf(buf, "DO  %6lu", julian_date - julian_birthdate);
+        sprintf(buf, "DO  %6lu", julian_date - julian_birthdate);  // counting up
     }
     watch_display_string(buf, 0);
 }

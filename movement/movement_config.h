@@ -31,27 +31,28 @@ const watch_face_t watch_faces[] = {
     simple_clock_face,
     //INTERNAL
     stock_stopwatch_face,
-    timer_face,
+    timer_face,                 // BRITTLE uses movement_schedule_background_task_for_face()
     alarm_face,
     counter_face,
     //water
-    thermistor_readout_face,
+    // work out which one of these I want to go with
+    //      need to memorise how they actually work
+        rpn_calculator_face,  // maybe this one but with symbols from alt_face?
+        rpn_calculator_alt_face,
     ratemeter_face,
     pulsometer_face,
     tachymeter_face,
     //telemeter
-        //TIME PASSAGE
+    //TIME PASSAGE
+    // combine into days left and time_remaining?
         day_one_face,
         time_left_face,
         //actual time left?
     tomato_face,
+        interval_face,
     probability_face,
     databank_face,
-        rpn_calculator_face,
-        rpn_calculator_alt_face,
         habit_face, //work out if I want to keep / use
-        interval_face,
-        ships_bell_face,
 
     memory_device_face,
     //EXTERNAL
@@ -61,16 +62,18 @@ const watch_face_t watch_faces[] = {
     //tide clock
     //due (rubbish bin)
     recycle_bin_face,
+        thermistor_readout_face,
+        thermistor_logging_face,
     preferences_face,
     set_time_face,
     voltage_face,
     finetune_face,
     nanosec_face,
-        thermistor_logging_face,
+    // setup & choose one
+    //      how to setup / maintain securely?
     totp_face,
     totp_face_lfs,
         character_set_face,
-        chirpy_demo_face,
 };
 
 #define MOVEMENT_NUM_FACES (sizeof(watch_faces) / sizeof(watch_face_t))

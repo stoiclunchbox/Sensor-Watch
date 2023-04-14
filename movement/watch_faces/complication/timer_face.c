@@ -34,7 +34,7 @@
 static const uint32_t _default_timer_values[] = {0x010000, 0x1E0300, 0x2800, 0x3700, 0x0001}; // default timers: 1sec, 3min30sec, 40min, 55min, 1hr
 
 // sound sequence for a single beeping sequence
-static const int8_t _sound_seq_beep[] = {BUZZER_NOTE_C8, 3, BUZZER_NOTE_REST, 3, -2, 2, BUZZER_NOTE_C8, 5, BUZZER_NOTE_REST, 25, 0};
+/* static const int8_t _sound_seq_beep[] = {BUZZER_NOTE_C8, 3, BUZZER_NOTE_REST, 3, -2, 2, BUZZER_NOTE_C8, 5, BUZZER_NOTE_REST, 25, 0}; */
 static const int8_t _sound_seq_start[] = {BUZZER_NOTE_C8, 2, 0};
 
 static uint8_t _beeps_to_play;    // temporary counter for ring signals playing
@@ -50,15 +50,16 @@ static void _start(timer_state_t *state, movement_settings_t *settings, bool wit
     if (state->mode == pausing)
         state->target_ts = state->now_ts + state->paused_left;
     else
-        // BUG overflow is probably somewhere in here
         state->target_ts = watch_utility_offset_timestamp(state->now_ts, 
                                                           state->timers[state->current_timer].unit.hours, 
                                                           state->timers[state->current_timer].unit.minutes, 
                                                           state->timers[state->current_timer].unit.seconds);
-    // BUG or in this line
     watch_date_time target_dt = watch_utility_date_time_from_unix_time(state->target_ts, _get_tz_offset(settings));
     state->mode = running;
-    movement_schedule_background_task(target_dt);
+    /* movement_schedule_background_task(target_dt); */
+    // BRITTLE hard coding to a fixed face postion seems like asking for bad juju to me
+    //          there has to be a better way
+    movement_schedule_background_task_for_face(2, target_dt);
     watch_set_indicator(WATCH_INDICATOR_BELL);
     if (settings->bit.button_should_sound && with_beep) watch_buzzer_play_sequence((int8_t *)_sound_seq_start, NULL);
 }
@@ -142,6 +143,8 @@ static void _resume_setting(timer_state_t *state) {
     state->settings_state = 0;
     state->mode = waiting;
     movement_request_tick_frequency(1);
+    // REVIEW this addition
+    watch_set_colon();
     _set_next_valid_timer(state);
 }
 
@@ -179,14 +182,6 @@ static void _abort_quick_cycle(timer_state_t *state) {
     }
 }
 
-static inline bool _check_for_signal() {
-    if (_beeps_to_play) {
-        _beeps_to_play = 0;
-        return true;
-    }
-    return false;
-}
-
 void timer_face_setup(movement_settings_t *settings, uint8_t watch_face_index, void ** context_ptr) {
     (void) settings;
     (void) watch_face_index;
@@ -204,8 +199,6 @@ void timer_face_setup(movement_settings_t *settings, uint8_t watch_face_index, v
 void timer_face_activate(movement_settings_t *settings, void *context) {
     (void) settings;
     timer_state_t *state = (timer_state_t *)context;
-    /* watch_display_string("TR", 0); */
-    // REVIEW decide whether I like TR or CD more
     watch_display_string("CD", 0);
     watch_set_colon();
     if(state->mode == running) {
@@ -214,7 +207,6 @@ void timer_face_activate(movement_settings_t *settings, void *context) {
         watch_set_indicator(WATCH_INDICATOR_BELL);
     } else {
         state->pausing_seconds = 1;
-        _beeps_to_play = 0;
     }
 }
 
@@ -228,7 +220,7 @@ bool timer_face_loop(movement_event_t event, movement_settings_t *settings, void
             _draw(state, event.subsecond);
             break;
         case EVENT_TICK:
-            if (state->mode == running) state->now_ts++; // REVIEW IMPORTANT really??? a no-checks increment?
+            if (state->mode == running) state->now_ts++;
             else if (state->mode == pausing) state->pausing_seconds++;
             else if (state->quick_cycle) {
                 if (watch_get_pin_level(BTN_ALARM)) {
@@ -238,7 +230,39 @@ bool timer_face_loop(movement_event_t event, movement_settings_t *settings, void
             }
             _draw(state, subsecond);
             break;
+        /* case EVENT_LIGHT_BUTTON_DOWN: */
+        /*     switch (state->mode) { */
+        /*         case pausing: */
+        /*         case running: */
+        /*             movement_illuminate_led(); */
+        /*             break; */
+        /*         case setting: */
+        /*             if (state->erase_timer_flag) { */
+        /*                 state->timers[state->current_timer].value = 0; */
+        /*                 state->erase_timer_flag = false; */
+        /*             } */
+        /*             state->settings_state = (state->settings_state + 1); */
+        /*             // skip asking to clear if no time set */
+        /*             if (state->settings_state == 1 && state->timers[state->current_timer].value == 0) state->settings_state = 2; */
+        /*             // skip 'loop y/n' and return to beginning of input if no time set (without checking lap bit) */
+        /*             else if (state->settings_state == 5 && (state->timers[state->current_timer].value & 0xFFFFFF) == 0) state->settings_state = 0; */
+        /*             // exit setting */
+        /*             else if (state->settings_state > 5) _resume_setting(state); */
+        /*             break; */
+        /*         default: */
+        /*             break; */
+        /*     } */
+        /*     _draw(state, event.subsecond); */
+        /*     break; */
+        /* case EVENT_LIGHT_BUTTON_UP: */
+        /*     if (state->mode == waiting) movement_illuminate_led(); */
+        /*     break; */
+        // TODO is it possible to not have led light up when light_short_pressing out of settings ?
+        // TODO also fix light_long_press while setting cycling to next settings position before canceling settings
+        // REVIEW the below as a solution to the above
         case EVENT_LIGHT_BUTTON_DOWN:
+            break;
+        case EVENT_LIGHT_BUTTON_UP:
             switch (state->mode) {
                 case pausing:
                 case running:
@@ -249,28 +273,23 @@ bool timer_face_loop(movement_event_t event, movement_settings_t *settings, void
                         state->timers[state->current_timer].value = 0;
                         state->erase_timer_flag = false;
                     }
-                    // TODO delete this
-                    /* state->settings_state = (state->settings_state + 1) % 6; */
                     state->settings_state = (state->settings_state + 1);
-                    // TODO flesh out comments?
-                    // don't ask to clear if no time set
+                    // skip asking to clear if no time set
                     if (state->settings_state == 1 && state->timers[state->current_timer].value == 0) state->settings_state = 2;
-                    // skip 'loop y/n' and return to beginning of input
+                    // skip 'loop y/n' and return to beginning of input if no time set (without checking lap bit)
                     else if (state->settings_state == 5 && (state->timers[state->current_timer].value & 0xFFFFFF) == 0) state->settings_state = 0;
                     // exit setting
                     else if (state->settings_state > 5) _resume_setting(state);
                     break;
+                case waiting:
+                    movement_illuminate_led();
                 default:
                     break;
             }
             _draw(state, event.subsecond);
             break;
-        case EVENT_LIGHT_BUTTON_UP:
-            if (state->mode == waiting) movement_illuminate_led();
-            break;
         case EVENT_ALARM_BUTTON_UP:
             _abort_quick_cycle(state);
-            if (_check_for_signal()) break;;
             switch (state->mode) {
                 case running:
                     state->mode = pausing;
@@ -305,6 +324,9 @@ bool timer_face_loop(movement_event_t event, movement_settings_t *settings, void
                 movement_request_tick_frequency(4);
             } else if (state->mode == setting) {
                 _resume_setting(state);
+            // REVIEW this addition
+            } else if (state->mode == running) {
+                movement_illuminate_led();
             }
             _draw(state, event.subsecond);
             break;
@@ -317,10 +339,6 @@ bool timer_face_loop(movement_event_t event, movement_settings_t *settings, void
             /* watch_buzzer_play_sequence((int8_t *)_sound_seq_beep, NULL); */
             _beeps_to_play = 30;
             movement_play_alarm_beeps(_beeps_to_play, BUZZER_NOTE_C8);
-            // BUG when face not active, overflow occurs when restarting lapped timers
-            //          but only when face not active
-            //     lapped timers are only started from here, hmm
-            //          has something to do with needing/not having foreground I suspect
             _reset(state);
             if (state->timers[state->current_timer].unit.repeat) _start(state, settings, false);
             break;
@@ -337,6 +355,10 @@ bool timer_face_loop(movement_event_t event, movement_settings_t *settings, void
                             state->quick_cycle = true;
                             movement_request_tick_frequency(8);
                             break;
+                        // long press from lap screen to quick start a timer
+                        case 5:
+                            _resume_setting(state);
+                            _start(state, settings, true);
                         default:
                             break;
                     }
@@ -357,7 +379,6 @@ bool timer_face_loop(movement_event_t event, movement_settings_t *settings, void
         case EVENT_ALARM_LONG_UP:
             _abort_quick_cycle(state);
             break;
-        case EVENT_MODE_LONG_PRESS:
         case EVENT_TIMEOUT:
             _abort_quick_cycle(state);
             if (state->mode != running) movement_move_to_face(0);
