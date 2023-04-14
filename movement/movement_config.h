@@ -45,12 +45,12 @@ const watch_face_t watch_faces[] = {
         time_left_face,
         //actual time left?
     tomato_face,
-        interval_face,
     probability_face,
     databank_face,
         rpn_calculator_face,
         rpn_calculator_alt_face,
         habit_face, //work out if I want to keep / use
+        interval_face,
         ships_bell_face,
 
     memory_device_face,
@@ -71,17 +71,9 @@ const watch_face_t watch_faces[] = {
     totp_face_lfs,
         character_set_face,
         chirpy_demo_face,
-        tempchart_face,
 };
 
 #define MOVEMENT_NUM_FACES (sizeof(watch_faces) / sizeof(watch_face_t))
-
-/* Determines what face to go to from the first face if you've already set 
- * a mode long press to go to the first face in preferences, and
- * excludes these faces from the normal rotation.
- * Usually it makes sense to set this to the preferences face.
- */
-/* #define MOVEMENT_SECONDARY_FACE_INDEX 0 // or (MOVEMENT_NUM_FACES - 2) */
-#define MOVEMENT_SECONDARY_FACE_INDEX (MOVEMENT_NUM_FACES - 16)
+#define MOVEMENT_SECONDARY_FACE_INDEX (MOVEMENT_NUM_FACES - 15)
 
 #endif // MOVEMENT_CONFIG_H_
