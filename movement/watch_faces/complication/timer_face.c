@@ -357,7 +357,6 @@ bool timer_face_loop(movement_event_t event, movement_settings_t *settings, void
         case EVENT_ALARM_LONG_UP:
             _abort_quick_cycle(state);
             break;
-        case EVENT_MODE_LONG_PRESS:
         case EVENT_TIMEOUT:
             _abort_quick_cycle(state);
             if (state->mode != running) movement_move_to_face(0);
