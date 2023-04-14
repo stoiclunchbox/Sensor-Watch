@@ -130,7 +130,7 @@ const char *zone_names[] = {
     "Sl",	// 13 :   8:00:00 (China Standard Time, Australian Western Standard Time)
     "WA",	// 14 :   8:45:00 (Australian Central Western Standard Time)
     "JA",	// 15 :   9:00:00 (Japan Standard Time, Korea Standard Time)
-    "SA",	// 16 :   9:30:00 (Australian Central Standard Time)
+    "CA",	// 16 :   9:30:00 (Australian Central Standard Time)
     "BN",	// 17 :  10:00:00 (Australian Eastern Standard Time)
     "LH",	// 18 :  10:30:00 (Lord Howe Standard Time)
     "SD",	// 19 :  11:00:00 (Solomon Islands Time)
@@ -210,7 +210,7 @@ void world_clock2_face_setup(movement_settings_t *settings, uint8_t watch_face_i
 
         // MY DEFAULTS preselected timezones
         state->zones[0].selected = true;    //UTC
-        state->zones[19].selected = true;   //SYD
+        /* state->zones[19].selected = true;   //SYD */
         state->zones[30].selected = true;   //LA
         state->zones[33].selected = true;   //NYC
 
@@ -254,16 +254,14 @@ static bool mode_display(movement_event_t event, movement_settings_t *settings, 
 	case EVENT_LOW_ENERGY_UPDATE:
 	    /* Update indicators and colon on refresh */
 	    if (refresh_face) {
-		watch_clear_indicator(WATCH_INDICATOR_SIGNAL);
-		watch_set_colon();
-                if (settings->bit.clock_mode_24h)
-                    watch_set_indicator(WATCH_INDICATOR_24H);
+            watch_clear_indicator(WATCH_INDICATOR_SIGNAL);
+            watch_set_colon();
+            if (settings->bit.clock_mode_24h) watch_set_indicator(WATCH_INDICATOR_24H);
+            state->previous_date_time = REFRESH_TIME;
+            refresh_face = false;
+        }
 
-                state->previous_date_time = REFRESH_TIME;
-                refresh_face = false;
-            }
-
-            /* Determine current time at time zone and store date/time */
+        /* Determine current time at time zone and store date/time */
 	    date_time = watch_rtc_get_date_time();
 	    date_time_local_day = watch_rtc_get_date_time();
 	    timestamp = watch_utility_date_time_to_unix_time(date_time, movement_timezone_offsets[settings->bit.time_zone] * 60);
@@ -281,17 +279,20 @@ static bool mode_display(movement_event_t event, movement_settings_t *settings, 
 		sprintf(buf, "%02d%02d", date_time.unit.minute, date_time.unit.second);
 	    } else {
 		/* Other stuff changed; Let's do it all. */
-		if (!settings->bit.clock_mode_24h) {
+		if (settings->bit.clock_mode_24h || state->current_zone == 0) {
+            watch_set_indicator(WATCH_INDICATOR_24H);
+		} else {
 		    /* If we are in 12 hour mode, do some cleanup. */
+            watch_clear_indicator(WATCH_INDICATOR_24H);
 		    if (date_time.unit.hour < 12) {
-			watch_clear_indicator(WATCH_INDICATOR_PM);
+                watch_clear_indicator(WATCH_INDICATOR_PM);
 		    } else {
-			watch_set_indicator(WATCH_INDICATOR_PM);
+                watch_set_indicator(WATCH_INDICATOR_PM);
 		    }
 		    date_time.unit.hour %= 12;
 		    if (date_time.unit.hour == 0)
 			date_time.unit.hour = 12;
-		}
+        }
 
 		pos = 0;
 
