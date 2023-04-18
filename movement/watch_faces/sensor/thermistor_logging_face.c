@@ -102,10 +102,17 @@ bool thermistor_logging_face_loop(movement_event_t event, movement_settings_t *s
             logger_state->ts_ticks = 2;
             _thermistor_logging_face_update_display(logger_state, settings->bit.use_imperial_units, settings->bit.clock_mode_24h);
             break;
-        case EVENT_ALARM_BUTTON_DOWN:
+        case EVENT_ALARM_BUTTON_UP:
             logger_state->display_index = (logger_state->display_index + 1) % THERMISTOR_LOGGING_NUM_DATA_POINTS;
             logger_state->ts_ticks = 0;
-            // fall through
+            _thermistor_logging_face_update_display(logger_state, settings->bit.use_imperial_units, settings->bit.clock_mode_24h);
+            break;
+        case EVENT_ALARM_LONG_PRESS:
+            // BUG overflows index when decrementing 'below' 0, but only for one index place, then it rights itself when inc'd or dec'd again. Turns out it went to pos 3.
+            logger_state->display_index = (logger_state->display_index - 1) % THERMISTOR_LOGGING_NUM_DATA_POINTS;
+            logger_state->ts_ticks = 0;
+            _thermistor_logging_face_update_display(logger_state, settings->bit.use_imperial_units, settings->bit.clock_mode_24h);
+            break;
         case EVENT_ACTIVATE:
             _thermistor_logging_face_update_display(logger_state, settings->bit.use_imperial_units, settings->bit.clock_mode_24h);
             break;
