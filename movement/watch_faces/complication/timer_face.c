@@ -61,6 +61,7 @@ static void _start(timer_state_t *state, movement_settings_t *settings, bool wit
     // BUG overflow
     /* movement_schedule_background_task(target_dt); */
     // BRITTLE hard coding to a fixed face postion seems like asking for bad juju to me
+    //          there has to be a better way
     movement_schedule_background_task_for_face(2, target_dt);
     watch_set_indicator(WATCH_INDICATOR_BELL);
     if (settings->bit.button_should_sound && with_beep) watch_buzzer_play_sequence((int8_t *)_sound_seq_start, NULL);
