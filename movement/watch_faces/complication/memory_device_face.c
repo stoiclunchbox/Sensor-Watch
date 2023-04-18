@@ -94,6 +94,9 @@ bool memory_device_face_loop(movement_event_t event, movement_settings_t *settin
     memory_device_state_t *state = (memory_device_state_t *)context;
 
     // TODO implement blinking in a reliable and non-blocking way
+    //          put big if clause in draw func
+    //              if (!subsecond % 4)
+    //                  just blink the thing
     /* movement_request_tick_frequency(4); */
 
     switch (event.event_type) {
@@ -102,13 +105,23 @@ bool memory_device_face_loop(movement_event_t event, movement_settings_t *settin
         case EVENT_ACTIVATE:
             _memory_device_face_draw(state, event.subsecond);
             break;
+        case EVENT_LIGHT_BUTTON_DOWN: // led
+            break;
+        case EVENT_LIGHT_LONG_PRESS:  // led
+            movement_illuminate_led();
+            break;
         case EVENT_LIGHT_BUTTON_UP:   // cycle cards
             state->card_idx++;
             if (state->card_idx >= CARDS) state->card_idx = 0;
             _memory_device_face_draw(state, event.subsecond);
+            movement_illuminate_led();
             break;
-        case EVENT_LIGHT_LONG_UP:     // reset card
+        case EVENT_LIGHT_LONG_UP:     // reset card / go to first card
+            // WIP first index if card empty
+            /* if () { */
             _memory_device_face_reset_card(state, state->card_idx);
+            /* } else { */
+            /* } */
             _memory_device_face_draw(state, event.subsecond);
             break;
         case EVENT_ALARM_BUTTON_UP:   // cycle chars

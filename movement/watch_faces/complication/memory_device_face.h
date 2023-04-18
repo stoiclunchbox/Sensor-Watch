@@ -36,6 +36,21 @@
 
 #define CARDS  9        // no of available pages (max. 16)
 
+/* typedef struct { */
+/*     union { */
+/*         struct { */
+/*             uint8_t pos0; */
+/*             uint8_t pos1; */
+/*             uint8_t pos2; */
+/*             uint8_t pos3; */
+/*             uint8_t pos4; */
+/*             uint8_t pos5; */
+/*         } card_values_t; */
+/*         uint16_t value; */
+/*     } */
+/*     uint8_t slot_idx : 3; */
+/* } card_data_t; */
+
 typedef struct {
     uint8_t pos[6];
     uint8_t slot_idx : 3;
