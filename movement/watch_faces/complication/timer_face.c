@@ -31,9 +31,7 @@
 #include "watch_utility.h"
 
 /* static const uint16_t _default_timer_values[] = {0x200, 0x500, 0xA00, 0x1400, 0x2D02}; // default timers: 2 min, 5 min, 10 min, 20 min, 2 h 45 min */
-/* static const uint32_t _default_timer_values[] = {0x010000, 0x1E0300, 0x2800, 0x3700, 0x0001}; // default timers: 1sec, 3min30sec, 40min, 55min, 1hr */
-//TESTING
-static const uint32_t _default_timer_values[] = {0x080000, 0x1E0300, 0x2800, 0x3700, 0x0001}; // default timers: 1sec, 3min30sec, 40min, 55min, 1hr
+static const uint32_t _default_timer_values[] = {0x010000, 0x1E0300, 0x2800, 0x3700, 0x0001}; // default timers: 1sec, 3min30sec, 40min, 55min, 1hr
 
 // sound sequence for a single beeping sequence
 static const int8_t _sound_seq_beep[] = {BUZZER_NOTE_C8, 3, BUZZER_NOTE_REST, 3, -2, 2, BUZZER_NOTE_C8, 5, BUZZER_NOTE_REST, 25, 0};
@@ -58,7 +56,6 @@ static void _start(timer_state_t *state, movement_settings_t *settings, bool wit
                                                           state->timers[state->current_timer].unit.seconds);
     watch_date_time target_dt = watch_utility_date_time_from_unix_time(state->target_ts, _get_tz_offset(settings));
     state->mode = running;
-    // BUG overflow
     /* movement_schedule_background_task(target_dt); */
     // BRITTLE hard coding to a fixed face postion seems like asking for bad juju to me
     //          there has to be a better way
@@ -185,14 +182,6 @@ static void _abort_quick_cycle(timer_state_t *state) {
     }
 }
 
-static inline bool _check_for_signal() {
-    if (_beeps_to_play) {
-        _beeps_to_play = 0;
-        return true;
-    }
-    return false;
-}
-
 void timer_face_setup(movement_settings_t *settings, uint8_t watch_face_index, void ** context_ptr) {
     (void) settings;
     (void) watch_face_index;
@@ -218,7 +207,6 @@ void timer_face_activate(movement_settings_t *settings, void *context) {
         watch_set_indicator(WATCH_INDICATOR_BELL);
     } else {
         state->pausing_seconds = 1;
-        _beeps_to_play = 0;
     }
 }
 
@@ -269,13 +257,12 @@ bool timer_face_loop(movement_event_t event, movement_settings_t *settings, void
         /* case EVENT_LIGHT_BUTTON_UP: */
         /*     if (state->mode == waiting) movement_illuminate_led(); */
         /*     break; */
-        // REVIEW the below
-        // TODO is it possible to not have this light up light_short_pressing out of settings ?
-        //          possibly not without compromising other functionality, it's a small thing
+        // TODO is it possible to not have led light up when light_short_pressing out of settings ?
+        // TODO also fix light_long_press while setting cycling to next settings position before canceling settings
+        // REVIEW the below as a solution to the above
         case EVENT_LIGHT_BUTTON_DOWN:
             break;
         case EVENT_LIGHT_BUTTON_UP:
-            /* if (state->mode == waiting) movement_illuminate_led(); */
             switch (state->mode) {
                 case pausing:
                 case running:
@@ -303,7 +290,6 @@ bool timer_face_loop(movement_event_t event, movement_settings_t *settings, void
             break;
         case EVENT_ALARM_BUTTON_UP:
             _abort_quick_cycle(state);
-            if (_check_for_signal()) break;;
             switch (state->mode) {
                 case running:
                     state->mode = pausing;
@@ -354,8 +340,6 @@ bool timer_face_loop(movement_event_t event, movement_settings_t *settings, void
             _beeps_to_play = 30;
             movement_play_alarm_beeps(_beeps_to_play, BUZZER_NOTE_C8);
             _reset(state);
-            // BUG OVERFLOW
-            // it is not possible to movement_schedule_background_task when being called from the backgound / face is not in foreground
             if (state->timers[state->current_timer].unit.repeat) _start(state, settings, false);
             break;
         case EVENT_ALARM_LONG_PRESS:

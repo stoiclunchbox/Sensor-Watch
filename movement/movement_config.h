@@ -31,7 +31,7 @@ const watch_face_t watch_faces[] = {
     simple_clock_face,
     //INTERNAL
     stock_stopwatch_face,
-    timer_face,
+    timer_face,                 // BRITTLE uses movement_schedule_background_task_for_face()
     alarm_face,
     counter_face,
     //water
