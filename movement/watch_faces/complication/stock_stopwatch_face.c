@@ -253,6 +253,7 @@ bool stock_stopwatch_face_loop(movement_event_t event, movement_settings_t *sett
             break;
         case EVENT_LIGHT_LONG_PRESS:
             // kind od hidden feature: long press toggles light on or off
+            // TODO make this work
             state->light_on_button = !state->light_on_button;
             if (state->light_on_button) movement_illuminate_led();
             else watch_set_led_off();
@@ -290,6 +291,7 @@ bool stock_stopwatch_face_loop(movement_event_t event, movement_settings_t *sett
                     movement_request_tick_frequency(2);
                     _set_colon();
                 }
+            // TODO reset on ligut button up or long up, so results can by viewed with led first
             } else {
                 if (_lap_ticks) {
                     // clear lap and show running stopwatch

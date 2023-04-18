@@ -66,11 +66,10 @@ const watch_face_t watch_faces[] = {
     voltage_face,
     finetune_face,
     nanosec_face,
-        thermistor_logging_face,
     totp_face,
     totp_face_lfs,
+        thermistor_logging_face,
         character_set_face,
-        chirpy_demo_face,
 };
 
 #define MOVEMENT_NUM_FACES (sizeof(watch_faces) / sizeof(watch_face_t))
