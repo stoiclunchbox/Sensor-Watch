@@ -37,12 +37,12 @@ static void _reset_card(memory_device_state_t *state, uint8_t _card) {
 
 static void _enable_quick_cycle(memory_device_state_t *state) {
     state->quick_cycle = true;
-    movement_request_tick_frequency(8);
+    /* movement_request_tick_frequency(8); */
 }
 
 static void _abort_quick_cycle(memory_device_state_t *state) {
     state->quick_cycle = false;
-    movement_request_tick_frequency(TICK_FREQ);
+    /* movement_request_tick_frequency(TICK_FREQ); */
 }
 
 static void _increment(memory_device_state_t *state) {
@@ -71,10 +71,11 @@ static void _memory_device_face_draw(memory_device_state_t *state, uint8_t subse
 
     // blink to indicate selected position
     uint8_t blink_idx = (state->card[state->card_idx].slot_idx + 4);
-    // TODO make this blink on a 3/4 duty cycle
-    if (subsecond % 2) {
-        if (state->card[state->card_idx].pos[state->card[state->card_idx].slot_idx] == 0) {
+    if (!state->quick_cycle) {
+        if (subsecond % 8 && state->card[state->card_idx].pos[state->card[state->card_idx].slot_idx] == 0) {
             buf[blink_idx] = '_';
+        } else if (!subsecond % 8) {
+            buf[blink_idx] = ' ';
         }
     }
 
@@ -139,23 +140,21 @@ bool memory_device_face_loop(movement_event_t event, movement_settings_t *settin
             _memory_device_face_draw(state, event.subsecond);
             break;
         case EVENT_ALARM_BUTTON_UP:   // cycle chars
-            /* _increment(state); */
+            _increment(state);
             //TESTING quick cycling
-            state->card[state->card_idx].slot_idx = (state->card[state->card_idx].slot_idx + 1) % 6;
+            /* state->card[state->card_idx].slot_idx = (state->card[state->card_idx].slot_idx + 1) % 6; */
             _memory_device_face_draw(state, event.subsecond);
             break;
         case EVENT_ALARM_LONG_PRESS:  // cycle position
-            /* state->card[state->card_idx].slot_idx = (state->card[state->card_idx].slot_idx + 1) % 6; */
+            state->card[state->card_idx].slot_idx = (state->card[state->card_idx].slot_idx + 1) % 6;
             //TESTING quick cycling
-            _enable_quick_cycle(state);
+            /* _enable_quick_cycle(state); */
             _memory_device_face_draw(state, event.subsecond);
             break;
-        case EVENT_ALARM_LONG_UP:  // cycle position
-            _abort_quick_cycle(state);
+        case EVENT_ALARM_LONG_UP:     // stop quick cycling
+            /* _abort_quick_cycle(state); */
             break;
         case EVENT_TIMEOUT:
-            // TODO implement once we make a tick based animation
-            /* movement_request_tick_frequency(1); */
             movement_move_to_face(0);
             break;
         case EVENT_LOW_ENERGY_UPDATE:

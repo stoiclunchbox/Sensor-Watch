@@ -35,7 +35,7 @@
  */
 
 // REVIEW
-#define TICK_FREQ   4    // blink speed
+#define TICK_FREQ   8    // blink speed
 #define CARDS       9    // no of available pages (max. 16)
 
 typedef struct {
