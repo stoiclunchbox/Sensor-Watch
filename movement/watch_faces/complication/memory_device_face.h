@@ -34,31 +34,21 @@
  *
  */
 
-#define CARDS  9        // no of available pages (max. 16)
-
-/* typedef struct { */
-/*     union { */
-/*         struct { */
-/*             uint8_t pos0; */
-/*             uint8_t pos1; */
-/*             uint8_t pos2; */
-/*             uint8_t pos3; */
-/*             uint8_t pos4; */
-/*             uint8_t pos5; */
-/*         } card_values_t; */
-/*         uint16_t value; */
-/*     } */
-/*     uint8_t slot_idx : 3; */
-/* } card_data_t; */
+// REVIEW
+#define TICK_FREQ   4    // blink speed
+#define CARDS       9    // no of available pages (max. 16)
 
 typedef struct {
     uint8_t pos[6];
     uint8_t slot_idx : 3;
+    // REVIEW bitfield efficiency
+    bool modified;
 } card_data_t;
 
 typedef struct {
     card_data_t card[CARDS];
     uint8_t card_idx : 4;
+    bool quick_cycle;
     const char *alphanums;
     const char *nums;
 } memory_device_state_t;

@@ -27,22 +27,34 @@
 #include "memory_device_face.h"
 
 
-static void _memory_device_face_reset_card(memory_device_state_t *state, uint8_t _card) {
+static void _reset_card(memory_device_state_t *state, uint8_t _card) {
     for (uint8_t i = 0; i < 6; i++) {
         state->card[_card].pos[i] = 0;
     }
     state->card[_card].slot_idx = 0;
+    state->card[_card].modified = false;
+}
+
+static void _abort_quick_cycle(memory_device_state_t *state) {
+    if (state->quick_cycle) {
+        state->quick_cycle = false;
+        movement_request_tick_frequency(TICK_FREQ);
+    }
+}
+
+static void _increment(memory_device_state_t *state) {
+    uint8_t slot = state->card[state->card_idx].slot_idx;
+
+    if (slot == 0 || slot == 2) {
+        state->card[state->card_idx].pos[slot] = (state->card[state->card_idx].pos[slot] + 1) % 11;
+    } else {
+        state->card[state->card_idx].pos[slot] = (state->card[state->card_idx].pos[slot] + 1) % 37;
+    }
+    state->card[state->card_idx].modified = true;
 }
 
 static void _memory_device_face_draw(memory_device_state_t *state, uint8_t subsecond) {
     char buf[17];
-
-    uint8_t slot = state->card[state->card_idx].slot_idx;
-    if (slot == 0 || slot == 2) {
-        if (state->card[state->card_idx].pos[slot] >= 11) state->card[state->card_idx].pos[slot] = 0;
-    } else {
-        if (state->card[state->card_idx].pos[slot] >= 37) state->card[state->card_idx].pos[slot] = 0;
-    }
 
     sprintf(buf, "MD%2d%c%c%c%c%c%c",
             (state->card_idx + 1),
@@ -54,12 +66,15 @@ static void _memory_device_face_draw(memory_device_state_t *state, uint8_t subse
             state->alphanums[state->card[state->card_idx].pos[5]]
             );
 
-    // WIP temporarily deactivated blinking while not fully implemented
     // blink to indicate selected position
-    /* if (subsecond % 2) { */
-    /*     uint8_t blink_idx = (selected + 4); */
-    /*     buf[blink_idx] = '-'; */
-    /* } */
+    if (subsecond % 2) {
+        uint8_t blink_idx = (state->card[state->card_idx].slot_idx + 4);
+        if (state->card[state->card_idx].pos[state->card[state->card_idx].slot_idx] == 0) {
+            buf[blink_idx] = '_';
+        /* } else { */
+        /*     buf[blink_idx] = ' '; */
+        }
+    }
 
     watch_display_string(buf, 0);
 }
@@ -74,63 +89,60 @@ void memory_device_face_setup(movement_settings_t *settings, uint8_t watch_face_
         // initialise default values
         state->alphanums = " 0123456789abcdefGhijkLmnopqrstuwxHyz";
         state->nums = " 0123456789";
-        // TODO implement underscores after implementing blinking?
-        /* state->alphanums = "_0123456789abcdefGhijkLmnopqrstuwxHyz"; */
-        /* state->nums = "_0123456789"; */
+
+        state->quick_cycle = false;
+        state->card_idx = 0;
 
         for (uint8_t i = 0; i < CARDS; i++) {
-            _memory_device_face_reset_card(state, i);
+            _reset_card(state, i);
         }
-        state->card_idx = 0;
     }
 }
 
 void memory_device_face_activate(movement_settings_t *settings, void *context) {
     (void) settings;
     (void) context;
+
+    movement_request_tick_frequency(TICK_FREQ);
 }
 
 bool memory_device_face_loop(movement_event_t event, movement_settings_t *settings, void *context) {
     memory_device_state_t *state = (memory_device_state_t *)context;
 
-    // TODO implement blinking in a reliable and non-blocking way
-    //          put big if clause in draw func
-    //              if (!subsecond % 4)
-    //                  just blink the thing
-    /* movement_request_tick_frequency(4); */
-
     switch (event.event_type) {
-        /* case EVENT_TICK:              // for animation */
+        case EVENT_TICK:              // for animation
+            if (state->quick_cycle) {
+                _increment(state);
+            }
             // Fall through
         case EVENT_ACTIVATE:
             _memory_device_face_draw(state, event.subsecond);
             break;
-        case EVENT_LIGHT_BUTTON_DOWN: // led
+        case EVENT_LIGHT_BUTTON_DOWN: // no led
             break;
         case EVENT_LIGHT_LONG_PRESS:  // led
             movement_illuminate_led();
             break;
-        case EVENT_LIGHT_BUTTON_UP:   // cycle cards
-            state->card_idx++;
-            if (state->card_idx >= CARDS) state->card_idx = 0;
+        case EVENT_LIGHT_BUTTON_UP:   // cycle cards / led
+            state->card_idx = (state->card_idx + 1) % CARDS;
             _memory_device_face_draw(state, event.subsecond);
             movement_illuminate_led();
             break;
         case EVENT_LIGHT_LONG_UP:     // reset card / go to first card
-            // WIP first index if card empty
-            /* if () { */
-            _memory_device_face_reset_card(state, state->card_idx);
-            /* } else { */
-            /* } */
+            if (state->card[state->card_idx].modified) {
+                _reset_card(state, state->card_idx);
+            } else {
+                state->card_idx = 0;
+            }
             _memory_device_face_draw(state, event.subsecond);
             break;
         case EVENT_ALARM_BUTTON_UP:   // cycle chars
-            state->card[state->card_idx].pos[state->card[state->card_idx].slot_idx]++;
+            _increment(state);
             _memory_device_face_draw(state, event.subsecond);
             break;
         case EVENT_ALARM_LONG_PRESS:  // cycle position
-            state->card[state->card_idx].slot_idx++;
-            if (state->card[state->card_idx].slot_idx >= 6) state->card[state->card_idx].slot_idx = 0;
+            _increment(state);
+            /* state->card[state->card_idx].slot_idx = (state->card[state->card_idx].slot_idx + 1) % 6; */
             _memory_device_face_draw(state, event.subsecond);
             break;
         case EVENT_TIMEOUT:
@@ -163,6 +175,6 @@ void memory_device_face_resign(movement_settings_t *settings, void *context) {
     (void) settings;
     (void) context;
 
-    // handle any cleanup before your watch face goes off-screen.
+    movement_request_tick_frequency(1);
 }
 
