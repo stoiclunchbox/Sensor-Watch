@@ -71,7 +71,7 @@ static void _memory_device_face_draw(memory_device_state_t *state, uint8_t subse
 
     // blink to indicate selected position
     uint8_t blink_idx = (state->card[state->card_idx].slot_idx + 4);
-    if (!state->quick_cycle) {
+    if (!state->quick_cycle && state->setting_mode) {
         if (subsecond % 8 && state->card[state->card_idx].pos[state->card[state->card_idx].slot_idx] == 0) {
             buf[blink_idx] = '_';
         } else if (!subsecond % 8) {
@@ -90,12 +90,14 @@ void memory_device_face_setup(movement_settings_t *settings, uint8_t watch_face_
         memory_device_state_t *state = (memory_device_state_t *)*context_ptr;
 
         // initialise default values
-        state->alphanums = " 0123456789abcdefGhijkLmnopqrstuwxHyz";
-        state->nums = " 0123456789";
-
+        /* state->alphanums = " 0123456789abcdefGhijkLmnopqrstuwxHyz"; */
+        /* state->nums = " 0123456789"; */
+        // REVIEW match number of button presses to number displayed
+        state->alphanums = " 1234567890abcdefGhijkLmnopqrstuwxHyz";
+        state->nums = " 1234567890";
         state->quick_cycle = false;
+        state->setting_mode = false;
         state->card_idx = 0;
-
         for (uint8_t i = 0; i < CARDS; i++) {
             _reset_card(state, i);
         }
@@ -113,6 +115,51 @@ bool memory_device_face_loop(movement_event_t event, movement_settings_t *settin
     memory_device_state_t *state = (memory_device_state_t *)context;
 
     switch (event.event_type) {
+
+        /* case EVENT_TICK:              // for animation */
+        /*     if (state->quick_cycle) { */
+        /*         _increment(state); */
+        /*     } */
+        /*     // Fall through */
+        /* case EVENT_ACTIVATE: */
+        /*     _memory_device_face_draw(state, event.subsecond); */
+        /*     break; */
+        /* case EVENT_LIGHT_BUTTON_DOWN: // no led */
+        /*     break; */
+        /* case EVENT_LIGHT_LONG_PRESS:  // led */
+        /*     movement_illuminate_led(); */
+        /*     break; */
+        /* case EVENT_LIGHT_BUTTON_UP:   // cycle cards / led */
+        /*     state->card_idx = (state->card_idx + 1) % CARDS; */
+        /*     _memory_device_face_draw(state, event.subsecond); */
+        /*     movement_illuminate_led(); */
+        /*     break; */
+        /* case EVENT_LIGHT_LONG_UP:     // reset card / go to first card */
+        /*     if (state->card[state->card_idx].modified) { */
+        /*         _reset_card(state, state->card_idx); */
+        /*     } else { */
+        /*         state->card_idx = 0; */
+        /*     } */
+        /*     _memory_device_face_draw(state, event.subsecond); */
+        /*     break; */
+        /* case EVENT_ALARM_BUTTON_UP:   // cycle chars */
+        /*     _increment(state); */
+        /*     _memory_device_face_draw(state, event.subsecond); */
+        /*     break; */
+        /* case EVENT_ALARM_LONG_PRESS:  // cycle position */
+        /*     state->card[state->card_idx].slot_idx = (state->card[state->card_idx].slot_idx + 1) % 6; */
+        /*     _memory_device_face_draw(state, event.subsecond); */
+        /*     break; */
+        /* case EVENT_ALARM_LONG_UP:     // stop quick cycling */
+        /*     /1* _abort_quick_cycle(state); *1/ */
+        /*     break; */
+        /* case EVENT_TIMEOUT: */
+        /*     movement_move_to_face(0); */
+        /*     break; */
+        /* case EVENT_LOW_ENERGY_UPDATE: */
+        /*     // not used because we timeout */
+        /*     break; */
+
         case EVENT_TICK:              // for animation
             if (state->quick_cycle) {
                 _increment(state);
@@ -126,8 +173,11 @@ bool memory_device_face_loop(movement_event_t event, movement_settings_t *settin
         case EVENT_LIGHT_LONG_PRESS:  // led
             movement_illuminate_led();
             break;
-        case EVENT_LIGHT_BUTTON_UP:   // cycle cards / led
-            state->card_idx = (state->card_idx + 1) % CARDS;
+        case EVENT_LIGHT_BUTTON_UP:
+            if (state->setting_mode) {
+            } else {                        // cycle cards / led
+                state->card_idx = (state->card_idx + 1) % CARDS;
+            }
             _memory_device_face_draw(state, event.subsecond);
             movement_illuminate_led();
             break;
