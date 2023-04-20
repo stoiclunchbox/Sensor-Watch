@@ -34,7 +34,6 @@
  *
  */
 
-// REVIEW
 #define TICK_FREQ   8    // blink speed
 #define CARDS       9    // no of available pages (max. 16)
 
@@ -49,7 +48,7 @@ typedef struct {
     card_data_t card[CARDS];
     uint8_t card_idx : 4;
     bool quick_cycle;
-    bool setting_mode;
+    bool edit_mode;
     const char *alphanums;
     const char *nums;
 } memory_device_state_t;
