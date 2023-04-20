@@ -37,12 +37,10 @@ static void _reset_card(memory_device_state_t *state, uint8_t _card) {
 
 static void _enable_quick_cycle(memory_device_state_t *state) {
     state->quick_cycle = true;
-    /* movement_request_tick_frequency(8); */
 }
 
 static void _abort_quick_cycle(memory_device_state_t *state) {
     state->quick_cycle = false;
-    /* movement_request_tick_frequency(TICK_FREQ); */
 }
 
 static void _increment(memory_device_state_t *state) {
@@ -69,15 +67,13 @@ static void _memory_device_face_draw(memory_device_state_t *state, uint8_t subse
             state->alphanums[state->card[state->card_idx].pos[5]]
             );
 
-    // TODO
-    //      make _ fixed (only for active pos) and blink ' ' over it
-    //      make modulo <8> % 4 for nice double blink
-    // blink to indicate selected position
+    // display cursor and blink to indicate selected position
     uint8_t blink_idx = (state->card[state->card_idx].slot_idx + 4);
     if (!state->quick_cycle && state->edit_mode) {
-        if (subsecond % 8 && state->card[state->card_idx].pos[state->card[state->card_idx].slot_idx] == 0) {
+        if (state->card[state->card_idx].pos[state->card[state->card_idx].slot_idx] == 0) {
             buf[blink_idx] = '_';
-        } else if (!subsecond % 8) {
+        }
+        if (subsecond % 4 == 0) {
             buf[blink_idx] = ' ';
         }
     }
@@ -116,50 +112,6 @@ bool memory_device_face_loop(movement_event_t event, movement_settings_t *settin
     memory_device_state_t *state = (memory_device_state_t *)context;
 
     switch (event.event_type) {
-
-        /* case EVENT_TICK:              // for animation */
-        /*     if (state->quick_cycle) { */
-        /*         _increment(state); */
-        /*     } */
-        /*     // Fall through */
-        /* case EVENT_ACTIVATE: */
-        /*     _memory_device_face_draw(state, event.subsecond); */
-        /*     break; */
-        /* case EVENT_LIGHT_BUTTON_DOWN: // no led */
-        /*     break; */
-        /* case EVENT_LIGHT_LONG_PRESS:  // led */
-        /*     movement_illuminate_led(); */
-        /*     break; */
-        /* case EVENT_LIGHT_BUTTON_UP:   // cycle cards / led */
-        /*     state->card_idx = (state->card_idx + 1) % CARDS; */
-        /*     _memory_device_face_draw(state, event.subsecond); */
-        /*     movement_illuminate_led(); */
-        /*     break; */
-        /* case EVENT_LIGHT_LONG_UP:     // reset card / go to first card */
-        /*     if (state->card[state->card_idx].modified) { */
-        /*         _reset_card(state, state->card_idx); */
-        /*     } else { */
-        /*         state->card_idx = 0; */
-        /*     } */
-        /*     _memory_device_face_draw(state, event.subsecond); */
-        /*     break; */
-        /* case EVENT_ALARM_BUTTON_UP:   // cycle chars */
-        /*     _increment(state); */
-        /*     _memory_device_face_draw(state, event.subsecond); */
-        /*     break; */
-        /* case EVENT_ALARM_LONG_PRESS:  // cycle position */
-        /*     state->card[state->card_idx].slot_idx = (state->card[state->card_idx].slot_idx + 1) % 6; */
-        /*     _memory_device_face_draw(state, event.subsecond); */
-        /*     break; */
-        /* case EVENT_ALARM_LONG_UP:     // stop quick cycling */
-        /*     /1* _abort_quick_cycle(state); *1/ */
-        /*     break; */
-        /* case EVENT_TIMEOUT: */
-        /*     movement_move_to_face(0); */
-        /*     break; */
-        /* case EVENT_LOW_ENERGY_UPDATE: */
-        /*     // not used because we timeout */
-        /*     break; */
 
         case EVENT_TICK:                    // for animation
             if (state->quick_cycle) _increment(state);
