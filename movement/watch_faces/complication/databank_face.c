@@ -72,6 +72,8 @@ void databank_face_setup(movement_settings_t *settings, uint8_t watch_face_index
     (void) context_ptr;
     (void) watch_face_index;
     // At boot, context_ptr will be NULL indicating that we don't have anyplace to store our context.
+    // on probation reset to first page when waking from sleep
+    databank_state.databank_page = 0;
 }
 
 void databank_face_activate(movement_settings_t *settings, void *context) {

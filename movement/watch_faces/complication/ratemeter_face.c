@@ -47,7 +47,7 @@ bool ratemeter_face_loop(movement_event_t event, movement_settings_t *settings, 
     char buf[14];
     switch (event.event_type) {
         case EVENT_ACTIVATE:
-            watch_display_string("ra          ", 0);
+            watch_display_string("ra  -     ", 0);
             break;
         case EVENT_ALARM_BUTTON_DOWN:
             if (ratemeter_state->ticks != 0) {
@@ -62,7 +62,7 @@ bool ratemeter_face_loop(movement_event_t event, movement_settings_t *settings, 
             break;
         case EVENT_TICK:
             if (ratemeter_state->rate == 0) {
-                watch_display_string("ra          ", 0);
+                watch_display_string("ra  -     ", 0);
             } else {
                 if (ratemeter_state->rate > 500) {
                     watch_display_string("ra      Hi", 0);

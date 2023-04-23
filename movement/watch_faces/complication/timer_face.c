@@ -30,8 +30,8 @@
 #include "watch.h"
 #include "watch_utility.h"
 
-/* static const uint16_t _default_timer_values[] = {0x200, 0x500, 0xA00, 0x1400, 0x2D02}; // default timers: 2 min, 5 min, 10 min, 20 min, 2 h 45 min */
-static const uint32_t _default_timer_values[] = {0x010000, 0x1E0300, 0x2800, 0x3700, 0x0001}; // default timers: 1sec, 3min30sec, 40min, 55min, 1hr
+// default timers:                               1sec,     3min30sec, 5min,  40min,  55min,  1hr,
+static const uint32_t _default_timer_values[] = {0x010000, 0x1E0300, 0x0500, 0x2800, 0x3700, 0x0001};
 
 // sound sequence for a single beeping sequence
 /* static const int8_t _sound_seq_beep[] = {BUZZER_NOTE_C8, 3, BUZZER_NOTE_REST, 3, -2, 2, BUZZER_NOTE_C8, 5, BUZZER_NOTE_REST, 25, 0}; */

@@ -314,7 +314,8 @@ struct {
     uint8_t output;
     void (*func)(calculator_state_t *);
 } functions[] = {
-    {{'n', 'o'}, 0, 1, fn_number},
+    // TODO add log2
+    {{'N', 'U'}, 0, 1, fn_number},
     {{'*', ' '}, 2, 1, fn_add},  // First position * actually looks like a '+'.
     {{'-', ' '}, 2, 1, fn_sub},
     {{'H', ' '}, 2, 1, fn_mul},  // For actual *, we throw in the middle vertical segment onto the H.
@@ -372,7 +373,7 @@ static void show_stack_top(calculator_state_t *s) {
     if (s->stack_size > 0) {
         show_number(C);
     } else {
-        watch_display_string("  ------", 2);
+        watch_display_string("        ", 2);
         watch_clear_colon();
     }
 }

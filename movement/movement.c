@@ -400,8 +400,6 @@ void app_wake_from_backup(void) {
 void app_setup(void) {
     watch_store_backup_data(movement_state.settings.reg, 0);
 
-    movement_state.prev_watch_face = 0;
-
     static bool is_first_launch = true;
 
     if (is_first_launch) {
@@ -420,6 +418,9 @@ void app_setup(void) {
         alarm_time.reg = 0;
         alarm_time.unit.second = 59; // after a match, the alarm fires at the next rising edge of CLK_RTC_CNT, so 59 seconds lets us update at :00
         watch_rtc_register_alarm_callback(cb_alarm_fired, alarm_time, ALARM_MATCH_SS);
+
+        // REVIEW moved this to setup to retain persistence after LE mode
+        movement_state.prev_watch_face = 0;
     }
     if (movement_state.le_mode_ticks != -1) {
         watch_disable_extwake_interrupt(BTN_ALARM);

@@ -28,7 +28,7 @@
 #include "movement.h"
 
 #define RPN_CALCULATOR_STACK_SIZE 4
-#define RPN_CALCULATOR_MAX_OPS 7;
+#define RPN_CALCULATOR_MAX_OPS 7
 
 typedef enum {
     rpn_calculator_op_add,

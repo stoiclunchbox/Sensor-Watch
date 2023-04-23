@@ -56,23 +56,26 @@ bool counter_face_loop(movement_event_t event, movement_settings_t *settings, vo
             print_counter(state);
             beep_counter(state);
             break;
-        case EVENT_LIGHT_LONG_PRESS:  // decrement & beeps toggle
-            if (state->counter_idx == 0) {
-                state->counter_beeps = (!state->counter_beeps);
-                print_counter(state);
-            } else {
+        case EVENT_LIGHT_LONG_PRESS:  // decrement
+            if (state->counter_idx != 0) {
                 state->counter_idx--;
                 print_counter(state);
                 beep_counter(state);
             }
             break;
-        case EVENT_ALARM_LONG_PRESS:  // reset
-            state->counter_idx=0;
+        case EVENT_ALARM_LONG_PRESS:  // reset & beeps toggle
+            if (state->counter_idx == 0) {
+                state->counter_beeps = (!state->counter_beeps);
+            } else {
+                state->counter_idx=0;
+            }
             print_counter(state);
+            beep_counter(state);
             break;
         case EVENT_TIMEOUT:
             if (!state->counter_beeps) movement_move_to_face(0);
             break;
+        // TODO add sleep animation if asleep in beep mode
         default:
             movement_default_loop_handler(event, settings);
             break;
@@ -85,6 +88,14 @@ bool counter_face_loop(movement_event_t event, movement_settings_t *settings, vo
 void beep_counter(counter_state_t *state) {
 
     if (state->counter_beeps == 0 || state->counter_idx > 99) return;
+
+    // beep to signify reset or toggling of beep function
+    if (state->counter_idx == 0) {
+        watch_buzzer_play_note(BUZZER_NOTE_B6, 40);
+        watch_buzzer_play_note(BUZZER_NOTE_REST, 30);
+        watch_buzzer_play_note(BUZZER_NOTE_B6, 40);
+        return;
+    };
 
     int low_count = state->counter_idx/5;
     int high_count = state->counter_idx - low_count * 5;

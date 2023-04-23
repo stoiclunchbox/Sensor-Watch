@@ -28,55 +28,48 @@
 #include "movement_faces.h"
 
 const watch_face_t watch_faces[] = {
+
     simple_clock_face,
     //INTERNAL
     stock_stopwatch_face,
-    timer_face,                 // BRITTLE uses movement_schedule_background_task_for_face()
+    timer_face,
     alarm_face,
     counter_face,
-    //water
-    // work out which one of these I want to go with
-    //      need to memorise how they actually work
-        rpn_calculator_face,  // maybe this one but with symbols from alt_face?
-        rpn_calculator_alt_face,
+    // water_tracker_face,
+    // habit_face,          // REVIEW work out if I want to keep / use
+    rpn_calculator_face,
     ratemeter_face,
     pulsometer_face,
+    // telemeter_face,
     tachymeter_face,
-    //telemeter
-    //TIME PASSAGE
-    // combine into days left and time_remaining?
-        day_one_face,
-        time_left_face,
-        //actual time left?
-    tomato_face,
-        interval_face,
+    // time_progress_face,
+    interval_face,
+    day_one_face,
+    time_left_face,
     probability_face,
     databank_face,
-        habit_face, //work out if I want to keep / use
+
 
     memory_device_face,
     //EXTERNAL
     world_clock2_face,
     sunrise_sunset_face,
     moon_phase_face,
-    //tide clock
-    //due (rubbish bin)
+    //tide_clock_face,
+    //due_face,             // rubbish bin
     recycle_bin_face,
-        thermistor_readout_face,
-        thermistor_logging_face,
+    thermistor_readout_face,
+    thermistor_logging_face,
+    voltage_face,
     preferences_face,
     set_time_face,
-    voltage_face,
     finetune_face,
     nanosec_face,
-    // setup & choose one
-    //      how to setup / maintain securely?
     totp_face,
-    totp_face_lfs,
-        character_set_face,
+
 };
 
 #define MOVEMENT_NUM_FACES (sizeof(watch_faces) / sizeof(watch_face_t))
-#define MOVEMENT_SECONDARY_FACE_INDEX (MOVEMENT_NUM_FACES - 15)
+#define MOVEMENT_SECONDARY_FACE_INDEX (MOVEMENT_NUM_FACES - 13)
 
 #endif // MOVEMENT_CONFIG_H_

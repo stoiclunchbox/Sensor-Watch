@@ -99,7 +99,12 @@ bool thermistor_logging_face_loop(movement_event_t event, movement_settings_t *s
             movement_illuminate_led();
             break;
         case EVENT_LIGHT_BUTTON_DOWN:
-            logger_state->ts_ticks = 2;
+            //REVIEW
+            if (logger_state->ts_ticks == 0) {
+                logger_state->ts_ticks = 2;
+            } else {
+                logger_state->ts_ticks = 0;
+            }
             _thermistor_logging_face_update_display(logger_state, settings->bit.use_imperial_units, settings->bit.clock_mode_24h);
             break;
         case EVENT_ALARM_BUTTON_UP:
