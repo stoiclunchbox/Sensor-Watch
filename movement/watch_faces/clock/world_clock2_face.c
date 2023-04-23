@@ -236,6 +236,12 @@ void world_clock2_face_activate(movement_settings_t *settings, void *context)
             break;
     }
     refresh_face = true;
+
+    if (state->zones[0].selected) {
+        state->current_zone = 0;
+    }
+
+    // TODO is there any chance of showing SYD time only when DST is active?
 }
 
 static bool mode_display(movement_event_t event, movement_settings_t *settings, world_clock2_state_t *state)
