@@ -99,6 +99,7 @@ bool thermistor_logging_face_loop(movement_event_t event, movement_settings_t *s
             movement_illuminate_led();
             break;
         case EVENT_LIGHT_BUTTON_DOWN:
+            //REVIEW
             if (logger_state->ts_ticks == 0) {
                 logger_state->ts_ticks = 2;
             } else {
