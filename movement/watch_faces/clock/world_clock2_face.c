@@ -286,6 +286,7 @@ static bool mode_display(movement_event_t event, movement_settings_t *settings, 
 	    } else {
 		/* Other stuff changed; Let's do it all. */
 		if (settings->bit.clock_mode_24h || state->current_zone == 0) {
+            watch_clear_indicator(WATCH_INDICATOR_PM);
             watch_set_indicator(WATCH_INDICATOR_24H);
 		} else {
 		    /* If we are in 12 hour mode, do some cleanup. */
