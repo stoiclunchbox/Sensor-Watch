@@ -56,19 +56,21 @@ bool counter_face_loop(movement_event_t event, movement_settings_t *settings, vo
             print_counter(state);
             beep_counter(state);
             break;
-        case EVENT_LIGHT_LONG_PRESS:  // decrement & beeps toggle
-            if (state->counter_idx == 0) {
-                state->counter_beeps = (!state->counter_beeps);
-                print_counter(state);
-            } else {
+        case EVENT_LIGHT_LONG_PRESS:  // decrement
+            if (state->counter_idx != 0) {
                 state->counter_idx--;
                 print_counter(state);
                 beep_counter(state);
             }
             break;
-        case EVENT_ALARM_LONG_PRESS:  // reset
-            state->counter_idx=0;
+        case EVENT_ALARM_LONG_PRESS:  // reset & beeps toggle
+            if (state->counter_idx == 0) {
+                state->counter_beeps = (!state->counter_beeps);
+            } else {
+                state->counter_idx=0;
+            }
             print_counter(state);
+            beep_counter(state);
             break;
         case EVENT_TIMEOUT:
             if (!state->counter_beeps) movement_move_to_face(0);
