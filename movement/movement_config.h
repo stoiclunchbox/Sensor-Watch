@@ -38,13 +38,13 @@ const watch_face_t watch_faces[] = {
     // work out which one of these I want to go with
     //      need to memorise how they actually work
         rpn_calculator_face,  // maybe this one but with symbols from alt_face?
-        rpn_calculator_alt_face,
+        /* rpn_calculator_alt_face, */
     ratemeter_face,
     pulsometer_face,
     tachymeter_face,
     //telemeter
     //TIME PASSAGE
-    // combine into days left and time_remaining?
+    // combine into days_left and time_remaining?
         day_one_face,
         time_left_face,
         //actual time left?
@@ -62,21 +62,18 @@ const watch_face_t watch_faces[] = {
     //tide clock
     //due (rubbish bin)
     recycle_bin_face,
-        thermistor_readout_face,
-        thermistor_logging_face,
+    thermistor_readout_face,
+    thermistor_logging_face,
     preferences_face,
     set_time_face,
     voltage_face,
     finetune_face,
     nanosec_face,
-    // setup & choose one
-    //      how to setup / maintain securely?
     totp_face,
-    totp_face_lfs,
-        character_set_face,
+    /* totp_face_lfs, */
 };
 
 #define MOVEMENT_NUM_FACES (sizeof(watch_faces) / sizeof(watch_face_t))
-#define MOVEMENT_SECONDARY_FACE_INDEX (MOVEMENT_NUM_FACES - 15)
+#define MOVEMENT_SECONDARY_FACE_INDEX (MOVEMENT_NUM_FACES - 13)
 
 #endif // MOVEMENT_CONFIG_H_
