@@ -88,6 +88,14 @@ void beep_counter(counter_state_t *state) {
 
     if (state->counter_beeps == 0 || state->counter_idx > 99) return;
 
+    // beep to signify reset or toggling of beep function
+    if (state->counter_idx == 0) {
+        watch_buzzer_play_note(BUZZER_NOTE_B6, 40);
+        watch_buzzer_play_note(BUZZER_NOTE_REST, 30);
+        watch_buzzer_play_note(BUZZER_NOTE_B6, 40);
+        return;
+    };
+
     int low_count = state->counter_idx/5;
     int high_count = state->counter_idx - low_count * 5;
 
