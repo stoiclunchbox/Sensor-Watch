@@ -88,7 +88,7 @@ static void _tachymeter_face_totals_lcd(tachymeter_state_t *state, bool show_tim
     }
     watch_display_string(buf, 0);
     if (!show_time){
-        // Show '/' besides 'H'
+        // Show '/' beside 'h'
         watch_set_pixel(0, 9);
         watch_set_pixel(0, 10);
     }
@@ -103,6 +103,8 @@ bool tachymeter_face_loop(movement_event_t event, movement_settings_t *settings,
             // Show distance in UI
             if (state->total_time == 0) {
                 _tachymeter_face_distance_lcd(event, state);
+            } else {
+                _tachymeter_face_totals_lcd(state, 0);
             }
             break;
         case EVENT_TICK:
