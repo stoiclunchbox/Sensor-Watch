@@ -128,6 +128,7 @@ bool memory_device_face_loop(movement_event_t event, movement_settings_t *settin
         case EVENT_LIGHT_BUTTON_UP:
             if (!state->edit_mode) {        // enter edit mode
                 state->edit_mode = true;
+                if (!state->card[state->card_idx].modified) state->card[state->card_idx].slot_idx = 0;
             } else {                        // cycle position
                 state->card[state->card_idx].slot_idx = (state->card[state->card_idx].slot_idx + 1) % 6;
             }
