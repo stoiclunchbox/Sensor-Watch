@@ -104,7 +104,7 @@ bool tachymeter_face_loop(movement_event_t event, movement_settings_t *settings,
             if (state->total_time == 0) {
                 _tachymeter_face_distance_lcd(event, state);
             } else {
-                _tachymeter_face_totals_lcd(state, 0);
+                _tachymeter_face_totals_lcd(state, false);  // always show time on activate
             }
             break;
         case EVENT_TICK:
@@ -153,12 +153,8 @@ bool tachymeter_face_loop(movement_event_t event, movement_settings_t *settings,
             }
             break;
         case EVENT_LIGHT_LONG_PRESS:
-            if (!state->running && !state->editing){
-                if (state->total_time != 0){
-                    // Clear results
-                    state->total_time = 0;
-                    state->total_speed = 0;
-                } else {
+            if (!state->running && !state->editing) {
+                if (state->total_time == 0) {
                     // Default distance
                     state->dist_digits.thousands  = 0;
                     state->dist_digits.hundreds   = 0;
@@ -167,8 +163,11 @@ bool tachymeter_face_loop(movement_event_t event, movement_settings_t *settings,
                     state->dist_digits.tenths     = 0;
                     state->dist_digits.hundredths = 0;
                     state->distance = _distance_from_struct(state->dist_digits);
+                    state->results_show_time = false;
+                    _tachymeter_face_distance_lcd(event, state);
+                } else {
+                    movement_illuminate_led();
                 }
-            _tachymeter_face_distance_lcd(event, state);
             }
             break;
         case EVENT_ALARM_BUTTON_UP:
@@ -225,26 +224,34 @@ bool tachymeter_face_loop(movement_event_t event, movement_settings_t *settings,
             }
             break;
         case EVENT_ALARM_LONG_PRESS:
-            if (!state->running && state->total_time == 0){
-                if (!state->editing) {
-                    // Enter editing
-                    state->editing = true;
-                    state->active_digit = 3;
-                    if (settings->bit.button_should_sound) {
-                        watch_buzzer_play_note(BUZZER_NOTE_C7, 80);
-                        watch_buzzer_play_note(BUZZER_NOTE_C8, 80);
-                    }
-                } else {
-                    // Exit editing
-                    state->editing = false;
-                    // Validate distance
-                    if(_distance_from_struct(state->dist_digits) == 0){
-                        state->dist_digits.ones = 1;
-                    }
-                    _tachymeter_face_distance_lcd(event, state);
-                    if (settings->bit.button_should_sound) {
-                        watch_buzzer_play_note(BUZZER_NOTE_C8, 80);
-                        watch_buzzer_play_note(BUZZER_NOTE_C7, 80);
+            if (!state->running){
+                if (state->total_time != 0 && !state->editing) {
+                        // Clear results
+                        state->total_time = 0;
+                        state->total_speed = 0;
+                        state->results_show_time = false;
+                        _tachymeter_face_distance_lcd(event, state);
+                } else if (state->total_time == 0) {
+                    if (!state->editing) {
+                        // Enter editing
+                        state->editing = true;
+                        state->active_digit = 3;
+                        if (settings->bit.button_should_sound) {
+                            watch_buzzer_play_note(BUZZER_NOTE_C7, 80);
+                            watch_buzzer_play_note(BUZZER_NOTE_C8, 80);
+                        }
+                    } else {
+                        // Exit editing
+                        state->editing = false;
+                        // Validate distance
+                        if (_distance_from_struct(state->dist_digits) == 0) {
+                            state->dist_digits.ones = 1;
+                        }
+                        _tachymeter_face_distance_lcd(event, state);
+                        if (settings->bit.button_should_sound) {
+                            watch_buzzer_play_note(BUZZER_NOTE_C8, 80);
+                            watch_buzzer_play_note(BUZZER_NOTE_C7, 80);
+                        }
                     }
                 }
             }
