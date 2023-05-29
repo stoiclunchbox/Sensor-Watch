@@ -75,6 +75,7 @@ bool counter_face_loop(movement_event_t event, movement_settings_t *settings, vo
         case EVENT_TIMEOUT:
             if (!state->counter_beeps) movement_move_to_face(0);
             break;
+        // TODO add sleep animation if asleep in beep mode
         default:
             movement_default_loop_handler(event, settings);
             break;

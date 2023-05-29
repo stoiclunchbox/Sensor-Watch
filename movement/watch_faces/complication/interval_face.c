@@ -84,6 +84,12 @@
 
 */
 
+// TODO
+//      my preset timers
+//      show slideshow continuously
+//      calc time on face activate ?
+//          to avoid showing incorrect value for <1sec before updating
+
 typedef enum {
     interval_setting_0_timer_idx,
     interval_setting_1_clear_yn,
@@ -113,12 +119,13 @@ typedef enum {
 //      4. full rounds (0 = no limit)
 //      5. cooldown seconds
 // Work time and break time: positive number = seconds, negative number = minutes
-static const int8_t _default_timers[6][5] = {{0, 40, 20, 0, 0},
-                                            {0, 45, 15, 0, 0},
-                                            {10, 20, 10, 8, 10},
-                                            {0, 35, 0, 0, 0},
-                                            {0, -25, -5, 0, 0},
-                                            {0, -20, -5, 0, 0}};
+/* static const int8_t _default_timers[6][5] = {{0, 40, 20, 0, 0}, */
+static const int8_t _default_timers[6][5] = {{0, -5, -10, 0, 0},
+                                            /* {0, 45, 15, 0, 0}, */
+                                            /* {10, 20, 10, 8, 10}, */
+                                            /* {0, 35, 0, 0, 0}, */
+                                            /* {0, -25, -5, 0, 0}, */
+                                            {0, -10, -5, 0, 0}};
 
 static const uint8_t _intro_segdata[4][2] = {{1, 8}, {0, 8}, {0, 7}, {1, 7}};
 static const uint8_t _blink_idx[] = {3, 9, 4, 6, 4, 6, 8, 4, 6, 8, 4, 6};
@@ -230,7 +237,7 @@ static void _face_draw(interval_face_state_t *state, uint8_t subsecond) {
         }
         _timer_write_info(state, buf, tmp);
         // blink at cursor position
-        if (subsecond % 2 && _ticks != -2) {
+        if (subsecond % 2 == 0 && _ticks != -2) {
             buf[_blink_idx[_setting_idx]] = ' ';
             if (_blink_idx[_setting_idx] % 2 == 0) buf[_blink_idx[_setting_idx] + 1] = ' ';
         }
@@ -332,7 +339,8 @@ static void _handle_alarm_button(interval_face_state_t *state) {
         if (state->timer[state->timer_idx].work_rounds == 0) state->timer[state->timer_idx].work_rounds = 1;
         break;
     case interval_setting_6_work_rounds:
-        _inc_uint8(&state->timer[state->timer_idx].work_rounds, 1, 100);
+        _inc_uint8(&state->timer[state->timer_idx].work_rounds, 1, 21);
+        if (state->timer[state->timer_idx].work_rounds == 0) state->timer[state->timer_idx].work_rounds = 1;
         break;
     case interval_setting_7_break_minutes:
         _inc_uint8(&state->timer[state->timer_idx].break_minutes, 1, 60);
@@ -341,7 +349,7 @@ static void _handle_alarm_button(interval_face_state_t *state) {
         _inc_uint8(&state->timer[state->timer_idx].break_seconds, 5, 60);
         break;
     case interval_setting_9_full_rounds:
-        _inc_uint8(&state->timer[state->timer_idx].full_rounds, 1, 100);
+        _inc_uint8(&state->timer[state->timer_idx].full_rounds, 1, 21);
         break;
     case interval_setting_10_cooldown_minutes:
         _inc_uint8(&state->timer[state->timer_idx].cooldown_minutes, 1, 60);
