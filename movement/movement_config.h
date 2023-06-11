@@ -42,6 +42,7 @@ const watch_face_t watch_faces[] = {
     rpn_calculator_face,  // REVIEW location/order  // TODO add improvements from alt_face
     // actual time left face / time progress (time_left_face,)
     day_one_face,
+    /* time_left_face,  // REVIEW do I want this face? */
     /* tomato_face,  // REVIEW do I want this face, should I improve it ? */
     interval_face,  // TODO setup pomodoro timer
     probability_face,

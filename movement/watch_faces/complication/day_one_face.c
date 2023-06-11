@@ -51,16 +51,12 @@ void day_one_face_setup(movement_settings_t *settings, uint8_t watch_face_index,
     if (*context_ptr == NULL) {
         *context_ptr = malloc(sizeof(day_one_state_t));
         memset(*context_ptr, 0, sizeof(day_one_state_t));
-        movement_birthdate_t movement_birthdate = (movement_birthdate_t) watch_get_backup_data(2);
-        if (movement_birthdate.reg == 0) {
-            // if birth date is totally blank, set a reasonable starting date. this works well for anyone under 63, but
-            // you can keep pressing to go back to 1900; just pass the current year. also picked this date because if you
-            // set it to 1959-01-02, it counts up from the launch of Luna-1, the first spacecraft to leave the well.
-            movement_birthdate.bit.year = 2023;
-            movement_birthdate.bit.month = 3;
-            movement_birthdate.bit.day = 23;
-            watch_store_backup_data(movement_birthdate.reg, 2);
-        }
+        day_one_state_t *state = (day_one_state_t *)*context_ptr;
+
+        // set starting date
+        state->birth_year = 2023;
+        state->birth_month = 3;
+        state->birth_day = 23;
     }
 }
 
@@ -73,12 +69,6 @@ void day_one_face_activate(movement_settings_t *settings, void *context) {
     state->current_year = date_time.unit.year + WATCH_RTC_REFERENCE_YEAR;
     // reset the current page to 0, display days alive.
     state->current_page = 0;
-
-    // fetch the user's birth date from the birthday register.
-    movement_birthdate_t movement_birthdate = (movement_birthdate_t) watch_get_backup_data(2);
-    state->birth_year = movement_birthdate.bit.year;
-    state->birth_month = movement_birthdate.bit.month;
-    state->birth_day = movement_birthdate.bit.day;
 }
 
 bool day_one_face_loop(movement_event_t event, movement_settings_t *settings, void *context) {
@@ -147,7 +137,6 @@ bool day_one_face_loop(movement_event_t event, movement_settings_t *settings, vo
         case EVENT_ALARM_BUTTON_UP:
             // if we are on a settings page, increment whatever value we're setting.
             if (state->current_page != 0) {
-                state->birthday_changed = true;
                 switch (state->current_page) {
                     case 1:
                         state->birth_year = state->birth_year + 1;
@@ -189,16 +178,5 @@ bool day_one_face_loop(movement_event_t event, movement_settings_t *settings, vo
 
 void day_one_face_resign(movement_settings_t *settings, void *context) {
     (void) settings;
-    day_one_state_t *state = (day_one_state_t *)context;
-
-    // if the user changed their birth date, store it to the birth date register
-    if (state->birthday_changed) {
-        day_one_state_t *state = (day_one_state_t *)context;
-        movement_birthdate_t movement_birthdate = (movement_birthdate_t) watch_get_backup_data(2);
-        movement_birthdate.bit.year = state->birth_year;
-        movement_birthdate.bit.month = state->birth_month;
-        movement_birthdate.bit.day = state->birth_day;
-        watch_store_backup_data(movement_birthdate.reg, 2);
-        state->birthday_changed = false;
-    }
+    (void) context;
 }
