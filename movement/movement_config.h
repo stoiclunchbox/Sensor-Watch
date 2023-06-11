@@ -35,19 +35,18 @@ const watch_face_t watch_faces[] = {
     alarm_face,
     counter_face,
     //water
-    rpn_calculator_face,  // add improvements from alt_face
     ratemeter_face,
     pulsometer_face,
     //telemeter
     tachymeter_face,
-    // actual time left face / time progress
+    rpn_calculator_face,  // REVIEW location/order  // TODO add improvements from alt_face
+    // actual time left face / time progress (time_left_face,)
     day_one_face,
-    tomato_face,  // do I actually want this face?
-    interval_face,
+    /* tomato_face,  // REVIEW do I want this face, should I improve it ? */
+    interval_face,  // TODO setup pomodoro timer
     probability_face,
     databank_face,
         habit_face, //work out if I want to keep / use
-        /* time_left_face, */
 
 
     memory_device_face,
