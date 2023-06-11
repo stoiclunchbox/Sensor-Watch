@@ -22,38 +22,40 @@
  * SOFTWARE.
  */
 
+
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 #include "rpn_calculator_face.h"
 
-static void draw_number(char *buf, float num) {
+
+static void draw_number(char *buf, float num, int8_t height) {
     float f = fmodf(num, 1.0) * 100;
-    sprintf(buf, "CA  %4d%02d", ((int)num) % 10000, (int) f);
+    sprintf(buf, "CA %d%4d%02d", (height + 1), ((int)num) % 10000, (int) f);
 }
 
 static void draw_op(char *buf, rpn_calculator_op_t op) {
     switch (op) {
         case rpn_calculator_op_add:
-            sprintf(buf, "CA     Add");
+            sprintf(buf, "CA o   Add");
         break;
         case rpn_calculator_op_sub:
-            sprintf(buf, "CA     sub");
+            sprintf(buf, "CA o   sub");
         break;
         case rpn_calculator_op_mul:
-            sprintf(buf, "CA    n&ul");
+            sprintf(buf, "CA o  n&ul");
         break;
         case rpn_calculator_op_div:
-            sprintf(buf, "CA     div");
+            sprintf(buf, "CA o   div");
         break;
         case rpn_calculator_op_pow:
-            sprintf(buf, "CA     pow");
+            sprintf(buf, "CA o   pow");
         break;
         case rpn_calculator_op_sqrt:
-            sprintf(buf, "CA    sqrt");
+            sprintf(buf, "CA o  sqrt");
         break;
         case rpn_calculator_op_pi:
-            sprintf(buf, "CA      pi");
+            sprintf(buf, "CA c    pi");
             break;
         default:
             break;
@@ -72,6 +74,11 @@ static void printf_stack(rpn_calculator_state_t *state) {
 
 static void next_op(rpn_calculator_state_t *state) {
     state->op += 1;
+    state->op = state->op % RPN_CALCULATOR_MAX_OPS;
+}
+
+static void prev_op(rpn_calculator_state_t *state) {
+    state->op += (RPN_CALCULATOR_MAX_OPS - 1);
     state->op = state->op % RPN_CALCULATOR_MAX_OPS;
 }
 
@@ -105,6 +112,16 @@ static void stack_push(rpn_calculator_state_t *state, float f) {
         }
     }
     state->stack[state->top] = f;
+}
+
+static void stack_drop(rpn_calculator_state_t *state) {  // TEST
+    printf_stack(state);
+    printf("drop: %f\n", state->stack[state->top]);
+    state->stack[state->top] = 0;
+    state->top--;
+    if (state->top < -1) {
+        state->top = -1;
+    }
 }
 
 static float stack_peek(rpn_calculator_state_t *state) {
@@ -210,7 +227,7 @@ static void draw(rpn_calculator_state_t *state, uint8_t subsecond) {
             sprintf(buf, "CA   err  ");
             break;
         case rpn_calculator_number:
-            draw_number(buf, stack_peek(state));
+            draw_number(buf, stack_peek(state), state->top);
             uint8_t i = 4 + (5 - state->selection);
             if (buf[i] == ' ') {
                 buf[i] = '0';
@@ -221,7 +238,7 @@ static void draw(rpn_calculator_state_t *state, uint8_t subsecond) {
             break;
         case rpn_calculator_waiting:
             printf_stack(state);
-            draw_number(buf, stack_peek(state));
+            draw_number(buf, stack_peek(state), state->top);
             break;
         case rpn_calculator_op:
             draw_op(buf, state->op);
@@ -281,6 +298,8 @@ bool rpn_calculator_face_loop(movement_event_t event, movement_settings_t *setti
             }
             break;
         case EVENT_LIGHT_BUTTON_DOWN:
+            break;
+        case EVENT_LIGHT_BUTTON_UP:
             switch (state->mode) {
                 case rpn_calculator_waiting:
                     state->mode = rpn_calculator_op;
@@ -295,6 +314,34 @@ bool rpn_calculator_face_loop(movement_event_t event, movement_settings_t *setti
                     draw(state, event.subsecond);
                     break;
                 default:
+                    // REVIEW
+                    movement_illuminate_led();
+                    break;
+            }
+            break;
+        case EVENT_LIGHT_LONG_PRESS:
+            switch (state->mode) {
+                case rpn_calculator_waiting:
+                    // clear all/stack
+                    for (uint8_t i=0;i<RPN_CALCULATOR_STACK_SIZE;i++) {
+                        state->stack[i] = 0;
+                    }
+                    state->top = -1;
+                    draw(state, event.subsecond);
+                    break;
+                case rpn_calculator_number:
+                    // cycle place in reverse direction
+                    state->selection = (state->selection + 5) % 6;
+                    draw(state, event.subsecond);
+                    break;
+                case rpn_calculator_op:
+                    // go to prev op
+                    // REVIEW mapping
+                    prev_op(state);
+                    draw(state, event.subsecond);
+                    break;
+                default:
+                    // REVIEW
                     movement_illuminate_led();
                     break;
             }
@@ -319,6 +366,40 @@ bool rpn_calculator_face_loop(movement_event_t event, movement_settings_t *setti
                     break;
                 case rpn_calculator_op:
                     run_op(state);
+                    draw(state, event.subsecond);
+                    break;
+                default:
+                    break;
+            }
+            break;
+        case EVENT_ALARM_LONG_PRESS:
+            switch (state->mode) {
+                case rpn_calculator_waiting:
+                    // clear line
+                    stack_drop(state);
+                    draw(state, event.subsecond);
+                    break;
+                case rpn_calculator_number:
+                    // REVIEW both options and choose one
+                    // TEST if 0 add 5, else set to zero
+                    /* if (state->stack[state->top] == 0) { */
+                    /*     state->stack[state->top] = 5; */
+                    /* } else { */
+                    /*     state->stack[state->top] = 0; */
+                    /* } */
+                    // if != 0 clear, else cancel
+                    if (state->stack[state->top] != 0) {
+                        state->stack[state->top] = 0;
+                    } else {
+                        state->mode = rpn_calculator_waiting;
+                    }
+                    printf_stack(state);
+                    draw(state, event.subsecond);
+                    break;
+                case rpn_calculator_op:
+                    // cancel
+                    // REVIEW mapping
+                    state->mode = rpn_calculator_waiting;
                     draw(state, event.subsecond);
                     break;
                 default:
