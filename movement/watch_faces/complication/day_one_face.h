@@ -30,6 +30,23 @@
 // The Day One face is designed to count upwards from the wearer's date of birth. It also functions as an
 // interface for setting the birth date register, which other watch faces can use for various purposes.
 
+    /* // WIP multiple dates that can be cyced through */
+
+    /* #define DAY_ONE_NUM_DATES */
+
+    /* typedef struct { */
+    /*     uint16_t birth_year; */
+    /*     uint8_t birth_month; */
+    /*     uint8_t birth_day; */
+    /* } day_one_dates_t; */
+
+    /* typedef struct { */
+    /*     uint8_t current_page; */
+    /*     uint16_t current_year; */
+    /*     uint8_t current_displayed_date; */
+    /*     day_one_dates_t[DAY_ONE_NUM_DATES]; */
+    /* } day_one_state_t; */
+
 typedef struct {
     uint8_t current_page;
     uint16_t current_year;
