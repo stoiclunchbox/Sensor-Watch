@@ -28,26 +28,26 @@
 #include "movement_faces.h"
 
 const watch_face_t watch_faces[] = {
+
     simple_clock_face,
     //INTERNAL
     stock_stopwatch_face,
     timer_face,
     alarm_face,
     counter_face,
-    //water
+    // water_face,
+    // habit_face,          // REVIEW work out if I want to keep / use
+    rpn_calculator_face,    // WIP add improvements from alt_face
     ratemeter_face,
     pulsometer_face,
-    //telemeter
+    // telemeter_face,
     tachymeter_face,
-    rpn_calculator_face,  // REVIEW location/order  // TODO add improvements from alt_face
-    // actual time left face / time progress (time_left_face,)
+    // time_progress_face,
     day_one_face,
-    /* time_left_face,  // REVIEW do I want this face? */
-    /* tomato_face,  // REVIEW do I want this face, should I improve it ? */
-    interval_face,  // TODO setup pomodoro timer
+    interval_face,
     probability_face,
     databank_face,
-        habit_face, //work out if I want to keep / use
+    time_left_face,
 
 
     memory_device_face,
@@ -55,8 +55,8 @@ const watch_face_t watch_faces[] = {
     world_clock2_face,
     sunrise_sunset_face,
     moon_phase_face,
-    //tide clock
-    //due (rubbish bin)
+    //tide_clock_face,
+    //due_face,             // rubbish bin
     recycle_bin_face,
     thermistor_readout_face,
     thermistor_logging_face,
@@ -67,6 +67,7 @@ const watch_face_t watch_faces[] = {
     nanosec_face,
     totp_face,
     character_set_face,
+
 };
 
 #define MOVEMENT_NUM_FACES (sizeof(watch_faces) / sizeof(watch_face_t))
