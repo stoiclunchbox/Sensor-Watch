@@ -35,9 +35,9 @@ const watch_face_t watch_faces[] = {
     timer_face,
     alarm_face,
     counter_face,
-    // water_face,
+    // water_tracker_face,
     // habit_face,          // REVIEW work out if I want to keep / use
-    rpn_calculator_face,    // WIP add improvements from alt_face
+    rpn_calculator_face,
     ratemeter_face,
     pulsometer_face,
     // telemeter_face,
