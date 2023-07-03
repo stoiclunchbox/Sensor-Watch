@@ -43,11 +43,11 @@ const watch_face_t watch_faces[] = {
     // telemeter_face,
     tachymeter_face,
     // time_progress_face,
-    day_one_face,
     interval_face,
+    day_one_face,
+    time_left_face,
     probability_face,
     databank_face,
-    time_left_face,
 
 
     memory_device_face,
