@@ -85,7 +85,7 @@
 #include "time_left_face.h"
 #include "memory_device_face.h"
 #include "recycle_bin_face.h"
-#include "water_tracker_face.h"
+// #include "water_tracker_face.h"
 // New includes go above this line.
 
 #endif // MOVEMENT_FACES_H_

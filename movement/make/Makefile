@@ -109,7 +109,7 @@ SRCS += \
   ../watch_faces/complication/time_left_face.c \
   ../watch_faces/complication/memory_device_face.c \
   ../watch_faces/complication/recycle_bin_face.c \
-  ../watch_faces/complication/water_tracker_face.c \
+  # ../watch_faces/complication/water_tracker_face.c \
 # New watch faces go above this line.
 
 # Leave this line at the bottom of the file; it has all the targets for making your project.

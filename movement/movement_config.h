@@ -66,11 +66,10 @@ const watch_face_t watch_faces[] = {
     finetune_face,
     nanosec_face,
     totp_face,
-    character_set_face,
 
 };
 
 #define MOVEMENT_NUM_FACES (sizeof(watch_faces) / sizeof(watch_face_t))
-#define MOVEMENT_SECONDARY_FACE_INDEX (MOVEMENT_NUM_FACES - 14)
+#define MOVEMENT_SECONDARY_FACE_INDEX (MOVEMENT_NUM_FACES - 13)
 
 #endif // MOVEMENT_CONFIG_H_
