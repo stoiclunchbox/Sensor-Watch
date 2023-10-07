@@ -91,6 +91,9 @@ bool simple_clock_face_loop(movement_event_t event, movement_settings_t *setting
                 watch_disable_adc();
                 // 2.2 volts will happen when the battery has maybe 5-10% remaining?
                 // we can refine this later.
+                // TODO increase this? (led starts losing colour at <2.6v)
+                //          but then it'll be annoying and I wont know if I have an alarm or not
+                //          can we make the indicator more subtle?
                 state->battery_low = (voltage < 2200);
             }
 
