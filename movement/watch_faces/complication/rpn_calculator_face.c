@@ -22,6 +22,16 @@
  * SOFTWARE.
  */
 
+// FIX
+//      tenths and hundreds are completely fucked/broken
+// TODO
+//      add more maths functions (o)
+//      add stack operations (s)
+//              put at end of list, so they can be readily accessed by scrolling back from add
+//          dup
+//          swap
+//          last
+//          rolld?
 
 #include <stdlib.h>
 #include <string.h>
@@ -85,6 +95,7 @@ static void prev_op(rpn_calculator_state_t *state) {
 // increase a digit of a floating point number
 // FIXME: this converts the number to string and back, there might
 // be better ways to do this
+// TODO there must be a better way... but it's probably not easy either
 static float inc_digit(float num, uint8_t position) {
     char buf[8];
     if (position > 5) {
@@ -114,7 +125,7 @@ static void stack_push(rpn_calculator_state_t *state, float f) {
     state->stack[state->top] = f;
 }
 
-static void stack_drop(rpn_calculator_state_t *state) {  // TEST
+static void stack_drop(rpn_calculator_state_t *state) {
     printf_stack(state);
     printf("drop: %f\n", state->stack[state->top]);
     state->stack[state->top] = 0;
@@ -122,6 +133,15 @@ static void stack_drop(rpn_calculator_state_t *state) {  // TEST
     if (state->top < -1) {
         state->top = -1;
     }
+}
+
+static void stack_clear(rpn_calculator_state_t *state) {
+    printf_stack(state);
+    printf("clear stack");
+    for (uint8_t i=0;i<RPN_CALCULATOR_STACK_SIZE;i++) {
+        state->stack[i] = 0;
+    }
+    state->top = -1;
 }
 
 static float stack_peek(rpn_calculator_state_t *state) {
@@ -286,6 +306,10 @@ bool rpn_calculator_face_loop(movement_event_t event, movement_settings_t *setti
         case EVENT_MODE_BUTTON_UP:
             switch (state->mode) {
                 case rpn_calculator_number:
+                    // restore stack height indicator if not pushing anything
+                    if (state->stack[state->top] == 0) {
+                        state->top--;
+                    }
                     state->mode = rpn_calculator_waiting;
                     draw(state, event.subsecond);
                     movement_request_tick_frequency(1);
@@ -322,11 +346,7 @@ bool rpn_calculator_face_loop(movement_event_t event, movement_settings_t *setti
         case EVENT_LIGHT_LONG_PRESS:
             switch (state->mode) {
                 case rpn_calculator_waiting:
-                    // clear all/stack
-                    for (uint8_t i=0;i<RPN_CALCULATOR_STACK_SIZE;i++) {
-                        state->stack[i] = 0;
-                    }
-                    state->top = -1;
+                    stack_clear(state);
                     draw(state, event.subsecond);
                     break;
                 case rpn_calculator_number:
@@ -349,11 +369,16 @@ bool rpn_calculator_face_loop(movement_event_t event, movement_settings_t *setti
         case EVENT_ALARM_BUTTON_UP:
             switch (state->mode) {
                 case rpn_calculator_waiting:
-                    state->mode = rpn_calculator_number;
-                    state->selection = 2;
-                    stack_push(state, 0);
-                    draw(state, event.subsecond);
-                    movement_request_tick_frequency(4);
+                    if (state->top < RPN_CALCULATOR_STACK_SIZE) {
+                        state->mode = rpn_calculator_number;
+                        state->selection = 2;
+                        stack_push(state, 0);
+                        draw(state, event.subsecond);
+                        movement_request_tick_frequency(4);
+                    } else {
+                        state->mode = rpn_calculator_err;
+                        draw(state, event.subsecond);
+                    }
                     break;
                 case rpn_calculator_number:
                     state->stack[state->top] = inc_digit(state->stack[state->top], state->selection);
@@ -380,17 +405,14 @@ bool rpn_calculator_face_loop(movement_event_t event, movement_settings_t *setti
                     draw(state, event.subsecond);
                     break;
                 case rpn_calculator_number:
-                    // REVIEW both options and choose one
-                    // TEST if 0 add 5, else set to zero
-                    /* if (state->stack[state->top] == 0) { */
-                    /*     state->stack[state->top] = 5; */
-                    /* } else { */
-                    /*     state->stack[state->top] = 0; */
-                    /* } */
-                    // if != 0 clear, else cancel
+                    // if !=0 clear, else cancel
                     if (state->stack[state->top] != 0) {
                         state->stack[state->top] = 0;
                     } else {
+                        // restore stack height indicator if not pushing anything
+                        if (state->stack[state->top] == 0) {
+                            state->top--;
+                        }
                         state->mode = rpn_calculator_waiting;
                     }
                     printf_stack(state);
