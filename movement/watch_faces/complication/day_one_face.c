@@ -140,7 +140,7 @@ bool day_one_face_loop(movement_event_t event, movement_settings_t *settings, vo
                 switch (state->current_page) {
                     case 1:
                         state->birth_year = state->birth_year + 1;
-                        if (state->birth_year > state->current_year) state->birth_year = 1900;
+                        if (state->birth_year > state->current_year + 1) state->birth_year = 1990;
                         break;
                     case 2:
                         state->birth_month = (state->birth_month % 12) + 1;
