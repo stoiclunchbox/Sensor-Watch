@@ -237,7 +237,6 @@ void time_left_face_setup(movement_settings_t *settings, uint8_t watch_face_inde
         }
         if (state->target_date.reg == 0) {
             // set target date to today + 10 years (just to have any value)
-            watch_date_time date_time = watch_rtc_get_date_time();
             state->target_date.bit.year = state->birth_date.bit.year + 70;
             state->target_date.bit.month = 1;
             state->target_date.bit.day = 1;
