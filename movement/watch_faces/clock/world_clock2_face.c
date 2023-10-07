@@ -104,6 +104,7 @@
 #include "watch_utility.h"
 
 static bool refresh_face;
+static bool first_activate_after_sleep;
 
 /* Simple macros for navigation */
 #define FORWARD             +1
@@ -215,6 +216,7 @@ void world_clock2_face_setup(movement_settings_t *settings, uint8_t watch_face_i
         state->zones[33].selected = true;   //NYC
 
     }
+    first_activate_after_sleep = 1;
 }
 
 void world_clock2_face_activate(movement_settings_t *settings, void *context)
@@ -237,9 +239,13 @@ void world_clock2_face_activate(movement_settings_t *settings, void *context)
     }
     refresh_face = true;
 
-    if (state->zones[0].selected) {
-        state->current_zone = 0;
+    // REVIEW on probation reset displayed zone to UTC only after activating watch after sleep
+    if (first_activate_after_sleep) {
+        if (state->zones[0].selected) {
+            state->current_zone = 0;
+        }
     }
+    first_activate_after_sleep = 0;
 
     // TODO is there any chance of showing SYD time only when DST is active?
 }
